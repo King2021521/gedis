@@ -8,3 +8,4 @@
 *.ipr
 logs
 pkg
+bin
