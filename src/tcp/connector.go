@@ -24,7 +24,6 @@ func Connect(server string) *net.TCPConn{
 		fmt.Println(conn.RemoteAddr().String(), os.Stderr, "Fatal error:", err)
 		os.Exit(1)
 	}
-	fmt.Println(conn.RemoteAddr(),conn)
 
 	fmt.Println("connection success")
 	return conn
