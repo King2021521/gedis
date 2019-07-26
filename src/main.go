@@ -1,13 +1,13 @@
 package main
 
 import (
-	"core"
+	"tcp"
 	"fmt"
 	"template"
 )
 
 func main() {
-	conn := core.Connect("10.10.5.239:6379")
+	conn := tcp.Connect("10.10.5.239:6379")
 	authResult := template.Auth("123456", conn)
 	fmt.Println("auth result:" + authResult)
 	sendResult := template.Set("name", "james", conn)
