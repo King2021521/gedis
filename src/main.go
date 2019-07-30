@@ -12,7 +12,7 @@ func main() {
 
 func testPool(){
 	var config = tcp.ConnConfig{"10.10.5.239:6379","123456"}
-	pool,err:=tcp.NewConnPool(10,1,config)
+	pool,err:=tcp.NewConnPool(1,config)
 	if err!=nil{
 		fmt.Println(err)
 	}

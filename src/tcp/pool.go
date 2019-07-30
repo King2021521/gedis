@@ -14,24 +14,19 @@ type ConnConfig struct {
 
 type ConnPool struct {
 	connPool   chan *net.TCPConn
-	maxActive  int
 	initActive int
 }
 
 /**
  * 初始化连接池
  */
-func NewConnPool(maxActive int, initActive int, config ConnConfig) (*ConnPool, error) {
-	if maxActive <= 0 {
-		return nil, errors.New("maxActive must gt than 0")
-	}
+func NewConnPool(initActive int, config ConnConfig) (*ConnPool, error) {
 	if initActive <= 0 {
 		return nil, errors.New("maxActive must gt than 0")
 	}
 
 	var pool ConnPool
 	channel := make(chan *net.TCPConn, initActive)
-	pool.maxActive = maxActive
 	pool.initActive = initActive
 
 	for index := 0; index < initActive; index++ {
