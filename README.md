@@ -1,5 +1,32 @@
 # gedis
 golang redis client  
+##demo  
+```
+func main(){
+    var config = tcp.ConnConfig{"127.0.0.1:6379","123456"}
+	pool,err:=tcp.NewConnPool(1,config)
+	if err!=nil{
+		fmt.Println(err)
+	}
+
+	conn,_:=tcp.GetConn(pool)
+	fmt.Println(conn.RemoteAddr())
+	sendResult := template.Set("name", "james", conn)
+	fmt.Println("send result:" + sendResult)
+	result := template.Get("name", conn)
+	fmt.Println("get result:" + result)
+
+	pool.PutConn(conn)
+
+	conn1,_:=tcp.GetConn(pool)
+	fmt.Println(conn1.RemoteAddr())
+	sendResult1 := template.Set("name", "james", conn)
+	fmt.Println("send result:" + sendResult1)
+	result1 := template.Get("name", conn)
+	fmt.Println("get result:" + result1)
+}
+```  
+
 特性：  
 基于原生golang开发  
 连接池管理  
