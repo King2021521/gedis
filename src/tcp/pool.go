@@ -3,8 +3,7 @@ package tcp
 import (
 	"errors"
 	"net"
-	"fmt"
-	"protocol"
+	"template"
 )
 
 type ConnConfig struct {
@@ -35,22 +34,13 @@ func NewConnPool(initActive int, config ConnConfig) (*ConnPool, error) {
 		//设置keepalive
 		conn.SetKeepAlive(true)
 		//为当前连接授权
-		auth(config.Pwd, conn)
+		template.Auth(config.Pwd, conn)
 		//将连接加入连接池
 		channel <- conn
 	}
 
 	pool.connPool = channel
 	return &pool, nil
-}
-
-/**
- * 授权当前连接
- */
-func auth(pwd string, conn *net.TCPConn) string {
-	var content = fmt.Sprintf(protocol.AuthCmdFormat, len(pwd), pwd)
-	result := Sender(conn, content)
-	return result
 }
 
 /**
