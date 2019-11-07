@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"fmt"
 	"os"
+	"github.com/emirpasic/gods/lists/arraylist"
 )
 
 /**
@@ -39,29 +40,26 @@ func Mset(conn *net.TCPConn, keyvalues ...string) string {
 	return sendCommand(conn, protocol.MSET, bytes...)
 }
 
-func Mget(conn *net.TCPConn, keys ...string) []string {
+func Mget(conn *net.TCPConn, keys ...string) []interface{} {
 	bytes := make([][]byte, len(keys))
 	for i := 0; i < len(keys); i++ {
 		bytes[i] = SafeEncode(keys[i])
 	}
 	result := sendCommand(conn, protocol.MGET, bytes...)
 	array := strings.Split(result, protocol.CRLF)
-	length, _ := strconv.Atoi(strings.ReplaceAll(array[0], protocol.ASTERISKBYTE, ""))
-	results := make([]string, length)
-	count := 0
+	results := arraylist.New()
 	for i := 1; i < len(array)-1; i++ {
 		if array[i] == "$-1" {
-			count++
+			results.Add(nil)
 			continue
 		}
-		results[count] = array[i+1]
-		count++
+		results.Add(array[i+1])
 		i++
 		if i > len(array)-2 {
 			break
 		}
 	}
-	return results
+	return results.Values()
 }
 
 func sendCommand(conn *net.TCPConn, cmd string, a ...[]byte) string {
