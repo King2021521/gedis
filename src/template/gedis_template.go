@@ -62,6 +62,11 @@ func Mget(conn *net.TCPConn, keys ...string) []interface{} {
 	return results.Values()
 }
 
+func Del(key string, conn *net.TCPConn) string {
+	result := sendCommand(conn, protocol.DEL, SafeEncode(key))
+	return strings.ReplaceAll(result,protocol.COLON_BYTE,"")
+}
+
 func sendCommand(conn *net.TCPConn, cmd string, a ...[]byte) string {
 	var buffer bytes.Buffer
 	buffer.Write(SafeEncode(protocol.ASTERISKBYTE))

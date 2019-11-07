@@ -13,7 +13,11 @@ import (
 func main() {
 	//testRange(protocol.SET,"name","zxm")
 	//testPool(getConn())
-	testMset(getConn())
+	//testMset(getConn())
+	conn:=getConn()
+	template.Set("aaa","aaa",conn)
+	result:=template.Del("aaa",conn)
+	fmt.Println(result)
 }
 
 func testRange(cmd string, a ...interface{}){
