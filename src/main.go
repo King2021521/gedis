@@ -7,11 +7,13 @@ import (
 	"bytes"
 	"protocol"
 	"strconv"
+	"net"
 )
 
 func main() {
 	//testRange(protocol.SET,"name","zxm")
-	testPool()
+	//testPool(getConn())
+	testMset(getConn())
 }
 
 func testRange(cmd string, a ...interface{}){
@@ -35,18 +37,31 @@ func testRange(cmd string, a ...interface{}){
 	fmt.Println(buffer.String())
 }
 
-func testPool(){
-	var config = tcp.ConnConfig{"127.0.0.1:6379","123456"}
-	pool,err:=tcp.NewConnPool(1,config)
+func getConn() *net.TCPConn{
+	var config = tcp.ConnConfig{"127.0.0.1:6379","root"}
+	pool,err:=tcp.NewConnPool(1, config)
 	if err!=nil{
 		fmt.Println(err)
 	}
 
 	conn,_:=tcp.GetConn(pool)
-	sendResult := template.Set("name", "james", conn)
-	fmt.Println("send result:" + sendResult)
-	result := template.Get("name", conn)
-	fmt.Println("get result:" + result)
+	return conn
+}
+
+func testMset(conn *net.TCPConn){
+	r1:=template.Mset(conn,"lakers","james","sun","book","cc","$1")
+	fmt.Println(r1)
+	r2:=template.Mget(conn,"lakers","sun1","cc")
+	fmt.Println("结果",r2,"len",len(r2),"cap",cap(r2))
+}
+
+func testPool(conn *net.TCPConn){
+	sendResult1 := template.Set("country1", "China LiaoNing DaLian", conn)
+	sendResult11 := template.Expire("country1", 10000, conn)
+	fmt.Println("send result1:" , sendResult1)
+	fmt.Println("send result11:" , sendResult11)
+	result := template.Get("country1", conn)
+	fmt.Println("get result country1:" + result)
 
 	/*pool.PutConn(conn)
 
