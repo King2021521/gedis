@@ -4,16 +4,12 @@ import (
 	"tcp"
 	"fmt"
 	"template"
-	"bytes"
-	"protocol"
-	"strconv"
 	"net"
 )
 
 func main() {
 	conn:=getConn()
-	result,_:=template.Mset(conn,"root111","1111","asdasdad","asdadad")
-
+	result:=template.Keys(conn,"nhash")
 	fmt.Println(result,"111")
 }
 

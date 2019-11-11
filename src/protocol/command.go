@@ -7,7 +7,7 @@ const MINUS_BYTE = "-"
 const COLON_BYTE = ":"
 const CRLF = "\r\n"
 const BLANK = ""
-const OK = "+OK"
+const OK = "+OK\r\n"
 const NONEXIST = "$-1"
 
 const PING = "PING"
