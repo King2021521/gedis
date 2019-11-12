@@ -34,7 +34,7 @@ func NewConnPool(initActive int, config ConnConfig) (*ConnPool, error) {
 		//设置keepalive
 		conn.SetKeepAlive(true)
 		//为当前连接授权
-		template.Auth(config.Pwd, conn)
+		template.Auth(conn, config.Pwd)
 		//将连接加入连接池
 		channel <- conn
 	}

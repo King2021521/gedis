@@ -9,8 +9,12 @@ import (
 
 func main() {
 	conn:=getConn()
-	result:=template.Zcard(conn,"sortset")
-	fmt.Println(result,"111")
+	result1,_:=template.Set(conn,"viewhigh","望海")
+	fmt.Println("设置结果",result1)
+	result2:=template.Expire(conn,"viewhigh", 1000)
+	fmt.Println("expire结果",result2)
+	result3:=template.Ttl(conn,"viewhigh")
+	fmt.Println("ttl结果",result3)
 }
 
 func getConn() *net.TCPConn{

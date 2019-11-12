@@ -10,7 +10,7 @@ import (
 /**
  * 认证权限
  */
-func Auth(pwd string, conn *net.TCPConn) (interface{}, error) {
+func Auth(conn *net.TCPConn, pwd string) (interface{}, error) {
 	result := SendCommand(conn, protocol.AUTH, protocol.SafeEncode(pwd))
 	if result != protocol.OK {
 		return nil, fmt.Errorf(result)
@@ -18,15 +18,15 @@ func Auth(pwd string, conn *net.TCPConn) (interface{}, error) {
 	return result, nil
 }
 
-func Set(key string, value string, conn *net.TCPConn) (interface{}, error) {
+func Set(conn *net.TCPConn, key string, value string) (interface{}, error) {
 	result := SendCommand(conn, protocol.SET, protocol.SafeEncode(key), protocol.SafeEncode(value))
 	if result != protocol.OK {
 		return nil, fmt.Errorf(result)
 	}
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK),protocol.PLUSBYTE,protocol.BLANK), nil
+	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.PLUSBYTE, protocol.BLANK), nil
 }
 
-func Get(key string, conn *net.TCPConn) (interface{}, error) {
+func Get(conn *net.TCPConn, key string) (interface{}, error) {
 	result := SendCommand(conn, protocol.GET, protocol.SafeEncode(key))
 	if strings.HasPrefix(result, protocol.NONEXIST) {
 		return nil, nil
@@ -48,7 +48,7 @@ func Mset(conn *net.TCPConn, keyvalues ...string) (interface{}, error) {
 	if result != protocol.OK {
 		return nil, fmt.Errorf(result)
 	}
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK),protocol.PLUSBYTE,protocol.BLANK), nil
+	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.PLUSBYTE, protocol.BLANK), nil
 }
 
 func Mget(conn *net.TCPConn, keys ...string) interface{} {
@@ -60,11 +60,11 @@ func Mget(conn *net.TCPConn, keys ...string) interface{} {
 	return HandleComplexResult(result)
 }
 
-func Setnx(key string, value string, conn *net.TCPConn) interface{} {
+func Setnx(conn *net.TCPConn, key string, value string) interface{} {
 	return SendCommand(conn, protocol.SETNX, protocol.SafeEncode(key), protocol.SafeEncode(value))
 }
 
-func Incr(key string, conn *net.TCPConn) interface{} {
+func Incr(conn *net.TCPConn, key string) interface{} {
 	result := SendCommand(conn, protocol.INCR, protocol.SafeEncode(key))
 	return strings.ReplaceAll(
 		strings.ReplaceAll(
@@ -72,12 +72,12 @@ func Incr(key string, conn *net.TCPConn) interface{} {
 		protocol.COLON_BYTE, protocol.BLANK)
 }
 
-func Decr(key string, conn *net.TCPConn) interface{} {
+func Decr(conn *net.TCPConn, key string) interface{} {
 	result := SendCommand(conn, protocol.DECR, protocol.SafeEncode(key))
 	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
 }
 
-func Setex(key string, time int64, value string, conn *net.TCPConn) (interface{}, error) {
+func Setex(conn *net.TCPConn, key string, time int64, value string) (interface{}, error) {
 	result := SendCommand(conn, protocol.SETEX, protocol.SafeEncode(key), protocol.SafeEncodeInt(time), protocol.SafeEncode(value))
 	if result != protocol.OK {
 		return nil, fmt.Errorf(result)
