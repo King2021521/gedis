@@ -9,8 +9,8 @@ import (
 
 func main() {
 	conn:=getConn()
-	result,err:=template.Lset(conn,"country",2,"aa")
-	fmt.Println(result,"111",err)
+	result:=template.Sdiff(conn,"set1","set2","set3")
+	fmt.Println(result,"111")
 }
 
 func getConn() *net.TCPConn{
