@@ -9,8 +9,8 @@ import (
 
 func main() {
 	conn:=getConn()
-	result:=template.Keys(conn,"nhash")
-	fmt.Println(result,"111")
+	result,err:=template.Lset(conn,"country",2,"aa")
+	fmt.Println(result,"111",err)
 }
 
 func getConn() *net.TCPConn{
