@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"fmt"
 	"os"
-	"strings"
-	"github.com/emirpasic/gods/lists/arraylist"
 )
 
 func SendCommand(conn *net.TCPConn, cmd string, a ...[]byte) string {
@@ -49,21 +47,4 @@ func send(conn *net.TCPConn, content bytes.Buffer) string {
 		os.Exit(1)
 	}
 	return string(buffer[:msg])
-}
-
-func HandleComplexResult(result string) interface{} {
-	array := strings.Split(result, protocol.CRLF)
-	results := arraylist.New()
-	for i := 1; i < len(array)-1; i++ {
-		if array[i] == protocol.NONEXIST {
-			results.Add(nil)
-			continue
-		}
-		results.Add(array[i+1])
-		i++
-		if i > len(array)-2 {
-			break
-		}
-	}
-	return results.Values()
 }

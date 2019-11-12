@@ -3,71 +3,51 @@ package template
 import (
 	"net"
 	"protocol"
-	"strings"
-	"fmt"
+	"template/handler"
 )
 
-func Sadd(conn *net.TCPConn, set string, elements ...string) interface{} {
-	bytes := make([][]byte, len(elements)+1)
-	bytes[0] = protocol.SafeEncode(set)
-	for i := 0; i < len(elements); i++ {
-		bytes[i+1] = protocol.SafeEncode(elements[i])
-	}
+func Sadd(conn *net.TCPConn, set string, elements ...string) (interface{}, error) {
+	bytes := handler.HandleMultiBulkRequest(set, elements)
 	result := SendCommand(conn, protocol.SADD, bytes...)
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
 
-func Smembers(conn *net.TCPConn, set string) interface{} {
+func Smembers(conn *net.TCPConn, set string) (interface{}, error) {
 	result := SendCommand(conn, protocol.SMEMBERS, protocol.SafeEncode(set))
-	return HandleComplexResult(result)
+	return handler.HandleReply(result)
 }
 
-func Srem(conn *net.TCPConn, set string, elements ...string) interface{} {
-	bytes := make([][]byte, len(elements)+1)
-	bytes[0] = protocol.SafeEncode(set)
-	for i := 0; i < len(elements); i++ {
-		bytes[i+1] = protocol.SafeEncode(elements[i])
-	}
+func Srem(conn *net.TCPConn, set string, elements ...string) (interface{}, error) {
+	bytes := handler.HandleMultiBulkRequest(set, elements)
 	result := SendCommand(conn, protocol.SREM, bytes...)
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
 
-func Sismember(conn *net.TCPConn, set string, value string) interface{} {
+func Sismember(conn *net.TCPConn, set string, value string) (interface{}, error) {
 	result := SendCommand(conn, protocol.SISMEMBER, protocol.SafeEncode(set), protocol.SafeEncode(value))
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
 
-func Scard(conn *net.TCPConn, set string) interface{} {
+func Scard(conn *net.TCPConn, set string) (interface{}, error) {
 	result := SendCommand(conn, protocol.SCARD, protocol.SafeEncode(set))
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
 
-func Srandmembers(conn *net.TCPConn, set string, count int64) interface{} {
+func Srandmembers(conn *net.TCPConn, set string, count int64) (interface{}, error) {
 	result := SendCommand(conn, protocol.SRANDMEMBER, protocol.SafeEncode(set), protocol.SafeEncodeInt(count))
-	return HandleComplexResult(result)
+	return handler.HandleReply(result)
 }
 
 func Spop(conn *net.TCPConn, set string) (interface{}, error) {
 	result := SendCommand(conn, protocol.SPOP, protocol.SafeEncode(set))
-	if strings.HasPrefix(result, protocol.NONEXIST) {
-		return nil, nil
-	}
-
-	if !strings.HasPrefix(result, protocol.DOLLARBYTE) {
-		return nil, fmt.Errorf(result)
-	}
-	array := strings.Split(result, protocol.CRLF)
-	return array[1], nil
+	return handler.HandleReply(result)
 }
 
 /**
  * 返回给定所有集合的差集
  */
-func Sdiff(conn *net.TCPConn, sets ... string) interface{} {
-	bytes := make([][]byte, len(sets))
-	for i := 0; i < len(sets); i++ {
-		bytes[i] = protocol.SafeEncode(sets[i])
-	}
+func Sdiff(conn *net.TCPConn, sets ... string) (interface{}, error) {
+	bytes := handler.HandleBulkRequest(sets)
 	result := SendCommand(conn, protocol.SDIFF, bytes...)
-	return HandleComplexResult(result)
+	return handler.HandleReply(result)
 }

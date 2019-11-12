@@ -3,74 +3,57 @@ package template
 import (
 	"net"
 	"protocol"
-	"strings"
-	"fmt"
+	"template/handler"
 )
 
-func Zadd(conn *net.TCPConn, zset string, scoresvalues ...string) interface{} {
-	bytes := make([][]byte, len(scoresvalues)+1)
-	bytes[0] = protocol.SafeEncode(zset)
-	for i := 0; i < len(scoresvalues); i++ {
-		bytes[i+1] = protocol.SafeEncode(scoresvalues[i])
-	}
+func Zadd(conn *net.TCPConn, zset string, scoresvalues ...string) (interface{}, error) {
+	bytes := handler.HandleMultiBulkRequest(zset, scoresvalues)
 	result := SendCommand(conn, protocol.ZADD, bytes...)
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
 
 func Zscore(conn *net.TCPConn, zset string, value string) (interface{}, error) {
 	result := SendCommand(conn, protocol.ZSCORE, protocol.SafeEncode(zset), protocol.SafeEncode(value))
-	if strings.HasPrefix(result, protocol.NONEXIST) {
-		return nil, nil
-	}
-
-	if !strings.HasPrefix(result, protocol.DOLLARBYTE) {
-		return nil, fmt.Errorf(result)
-	}
-	array := strings.Split(result, protocol.CRLF)
-	return array[1], nil
+	return handler.HandleReply(result)
 }
 
-func Zrange(conn *net.TCPConn, zset string, start int64, end int64) interface{} {
+func Zrange(conn *net.TCPConn, zset string, start int64, end int64) (interface{}, error) {
 	result := SendCommand(conn, protocol.ZRANGE, protocol.SafeEncode(zset), protocol.SafeEncodeInt(start), protocol.SafeEncodeInt(end))
-	return HandleComplexResult(result)
+	return handler.HandleReply(result)
 }
 
-func ZrangeWithScores(conn *net.TCPConn, zset string, start int64, end int64) interface{} {
+func ZrangeWithScores(conn *net.TCPConn, zset string, start int64, end int64) (interface{}, error) {
 	result := SendCommand(conn, protocol.ZRANGE, protocol.SafeEncode(zset), protocol.SafeEncodeInt(start), protocol.SafeEncodeInt(end), protocol.SafeEncode("WITHSCORES"))
-	return HandleComplexResult(result)
+	return handler.HandleReply(result)
 }
 
-func Zrevrange(conn *net.TCPConn, zset string, start int64, end int64) interface{} {
+func Zrevrange(conn *net.TCPConn, zset string, start int64, end int64) (interface{}, error) {
 	result := SendCommand(conn, protocol.ZREVRANGE, protocol.SafeEncode(zset), protocol.SafeEncodeInt(start), protocol.SafeEncodeInt(end))
-	return HandleComplexResult(result)
+	return handler.HandleReply(result)
 }
 
-func ZrevrangeWithScores(conn *net.TCPConn, zset string, start int64, end int64) interface{} {
+func ZrevrangeWithScores(conn *net.TCPConn, zset string, start int64, end int64) (interface{}, error) {
 	result := SendCommand(conn, protocol.ZREVRANGE, protocol.SafeEncode(zset), protocol.SafeEncodeInt(start), protocol.SafeEncodeInt(end), protocol.SafeEncode("WITHSCORES"))
-	return HandleComplexResult(result)
+	return handler.HandleReply(result)
 }
 
-func Zcard(conn *net.TCPConn, zset string) interface{} {
+func Zcard(conn *net.TCPConn, zset string) (interface{}, error) {
 	result := SendCommand(conn, protocol.ZCARD, protocol.SafeEncode(zset))
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
 
-func Zrem(conn *net.TCPConn, zset string, elements ...string) interface{} {
-	bytes := make([][]byte, len(elements)+1)
-	bytes[0] = protocol.SafeEncode(zset)
-	for i := 0; i < len(elements); i++ {
-		bytes[i+1] = protocol.SafeEncode(elements[i])
-	}
+func Zrem(conn *net.TCPConn, zset string, elements ...string) (interface{}, error) {
+	bytes := handler.HandleMultiBulkRequest(zset, elements)
 	result := SendCommand(conn, protocol.ZREM, bytes...)
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
 
-func Zrank(conn *net.TCPConn, zset string, value string) interface{} {
+func Zrank(conn *net.TCPConn, zset string, value string) (interface{}, error) {
 	result := SendCommand(conn, protocol.ZRANK, protocol.SafeEncode(zset))
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
 
-func Zrevrank(conn *net.TCPConn, zset string, value string) interface{} {
+func Zrevrank(conn *net.TCPConn, zset string, value string) (interface{}, error) {
 	result := SendCommand(conn, protocol.ZREVRANK, protocol.SafeEncode(zset))
-	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.COLON_BYTE, protocol.BLANK)
+	return handler.HandleReply(result)
 }
