@@ -9,7 +9,7 @@ import (
 
 func main() {
 	conn:=getConn()
-	result:=template.Sdiff(conn,"set1","set2","set3")
+	result:=template.Zcard(conn,"sortset")
 	fmt.Println(result,"111")
 }
 
