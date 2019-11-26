@@ -3,14 +3,32 @@ package main
 import (
 	"tcp"
 	"fmt"
-	"template"
 	"net"
+	"bytes"
+	"encoding/binary"
+	. "cluster"
 )
 
 func main() {
-	conn:=getConn()
+	/*conn:=getConn()
 	result1,_:=template.Mget(conn,"name","hh")
-	fmt.Println("结果",result1)
+	fmt.Println("结果",result1)*/
+	//mData := []byte{0x01,0x02,0x03,0x04}
+	mData :=[]byte("zhangxiaomin")
+	checksum := Crc16(mData)
+
+	fmt.Printf("check sum:%d \n",GetHashSlot(checksum))
+
+	int16buf := new(bytes.Buffer)
+
+	binary.Write(int16buf,binary.LittleEndian,checksum)
+	fmt.Printf("write buf is: %+X \n",int16buf.Bytes())
+
+	fmt.Printf("output-before:%X \n", mData)
+	mData = append(mData,int16buf.Bytes()...)
+
+	fmt.Printf("output-after:%X \n", mData)
+
 }
 
 func getConn() *net.TCPConn{
