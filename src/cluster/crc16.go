@@ -49,5 +49,5 @@ func Crc16(data []byte) uint16 {
  * 取余16384，得到hash slot的值
  */
 func GetHashSlot(crc uint16) uint16 {
-	return crc % 16384
+	return crc & (16384 - 1)
 }
