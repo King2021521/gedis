@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"template"
+	"sync"
 )
 
 type ConnConfig struct {
@@ -14,6 +15,19 @@ type ConnConfig struct {
 type ConnPool struct {
 	connPool   chan *net.TCPConn
 	initActive int
+}
+
+var pool *ConnPool
+var oSingle sync.Once
+
+/**
+ * 单例的连接池（线程安全）
+ */
+func NewSingleConnPool(initActive int, config ConnConfig) *ConnPool {
+	oSingle.Do(func() {
+		pool, _ = NewConnPool(initActive, config)
+	})
+	return pool
 }
 
 /**
