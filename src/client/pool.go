@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"sync"
+	"protocol"
 )
 
 type ConnConfig struct {
@@ -47,13 +48,17 @@ func NewConnPool(initActive int, config ConnConfig) (*ConnPool, error) {
 		//设置keepalive
 		conn.SetKeepAlive(true)
 		//为当前连接授权
-		Auth(conn, config.Pwd)
+		auth(conn, config.Pwd)
 		//将连接加入连接池
 		channel <- conn
 	}
 
 	pool.connPool = channel
 	return &pool, nil
+}
+
+func auth(conn *net.TCPConn, pwd string){
+	SendCommand(conn, protocol.AUTH, protocol.SafeEncode(pwd))
 }
 
 /**

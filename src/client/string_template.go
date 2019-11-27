@@ -1,7 +1,6 @@
 package client
 
 import (
-	"net"
 	"protocol"
 	"client/handler"
 	"fmt"
@@ -10,7 +9,13 @@ import (
 /**
  * 认证权限
  */
-func Auth(conn *net.TCPConn, pwd string) (interface{}, error) {
+func (client *Client) Auth(pwd string) (interface{}, error) {
+	pool := client.getConnectPool()
+	conn, err := GetConn(pool)
+	if err != nil {
+		return nil, fmt.Errorf("get conn fail")
+	}
+	defer pool.PutConn(conn)
 	result := SendCommand(conn, protocol.AUTH, protocol.SafeEncode(pwd))
 	return handler.HandleReply(result)
 }

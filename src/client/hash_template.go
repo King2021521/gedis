@@ -1,7 +1,6 @@
 package client
 
 import (
-	"net"
 	"protocol"
 	"client/handler"
 	"fmt"
