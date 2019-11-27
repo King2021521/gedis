@@ -1,21 +1,24 @@
 package main
 
 import (
-	"tcp"
+	"client"
 	"fmt"
 	"net"
 )
 
 func main() {
-	/*conn:=getConn()
-	result1,_:=template.Mget(conn,"name","hh")
-	fmt.Println("结果",result1)*/
+	var config = client.ConnConfig{"127.0.0.1:6379","root"}
+	pool:= client.NewSingleConnPool(1, config)
+
+	client1:=client.BuildClient(pool)
+	client2:=client.BuildClient(pool)
+	fmt.Println(client1,client2)
+	//fmt.Println(client.Get("hh"))
 }
 
 func getConn() *net.TCPConn{
-	var config = tcp.ConnConfig{"127.0.0.1:6379","root"}
-	pool:=tcp.NewSingleConnPool(1, config)
-	fmt.Println("------",pool)
-	conn,_:=tcp.GetConn(pool)
+	var config = client.ConnConfig{"127.0.0.1:6379","root"}
+	pool:= client.NewSingleConnPool(1, config)
+	conn,_:= client.GetConn(pool)
 	return conn
 }

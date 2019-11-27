@@ -1,4 +1,4 @@
-package tcp
+package client
 
 import (
 	"net"

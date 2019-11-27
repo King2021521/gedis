@@ -1,9 +1,8 @@
-package tcp
+package client
 
 import (
 	"errors"
 	"net"
-	"template"
 	"sync"
 )
 
@@ -48,7 +47,7 @@ func NewConnPool(initActive int, config ConnConfig) (*ConnPool, error) {
 		//设置keepalive
 		conn.SetKeepAlive(true)
 		//为当前连接授权
-		template.Auth(conn, config.Pwd)
+		Auth(conn, config.Pwd)
 		//将连接加入连接池
 		channel <- conn
 	}
