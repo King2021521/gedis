@@ -16,6 +16,10 @@ import (
  * 5、-ERR(WRONGTYPE...)
  */
 func HandleReply(result string) (interface{}, error) {
+	if strings.HasPrefix(result, protocol.MOVED) {
+		return handleMovedReply(result)
+	}
+
 	if strings.HasPrefix(result, protocol.MINUS_BYTE) {
 		return handleMinusReply(result)
 	}
@@ -80,4 +84,10 @@ func handleColonReply(result string) (interface{}, error) {
 
 func handleMinusReply(result string) (interface{}, error) {
 	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.MINUS_BYTE, protocol.BLANK), nil
+}
+
+func handleMovedReply(result string) (interface{}, error) {
+	movedInfo := strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.MINUS_BYTE, protocol.BLANK)
+	array := strings.Split(movedInfo, " ")
+	return array[2], fmt.Errorf(protocol.MOVED)
 }

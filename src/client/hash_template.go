@@ -6,8 +6,21 @@ import (
 	"fmt"
 )
 
+func (cluster *Cluster) Hset(hash string, key string, value string) (interface{}, error) {
+	result, err := executeHset(cluster.RandomSelect(), hash, key, value)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHset(cluster.SelectOne(result.(string)), hash, key, value)
+}
+
 func (client *Client) Hset(hash string, key string, value string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHset(client.getConnectPool(), hash, key, value)
+}
+
+func executeHset(pool *ConnPool, hash string, key string, value string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -17,8 +30,21 @@ func (client *Client) Hset(hash string, key string, value string) (interface{}, 
 	return handler.HandleReply(result)
 }
 
+func (cluster *Cluster) Hget(hash string, key string) (interface{}, error) {
+	result, err := executeHget(cluster.RandomSelect(), hash, key)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHget(cluster.SelectOne(result.(string)), hash, key)
+}
+
 func (client *Client) Hget(hash string, key string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHget(client.getConnectPool(), hash, key)
+}
+
+func executeHget(pool *ConnPool, hash string, key string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -28,8 +54,21 @@ func (client *Client) Hget(hash string, key string) (interface{}, error) {
 	return handler.HandleReply(result)
 }
 
+func (cluster *Cluster) Hmset(hash string, keyvalues ...string) (interface{}, error) {
+	result, err := executeHmset(cluster.RandomSelect(), hash, keyvalues)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHmset(cluster.SelectOne(result.(string)), hash, keyvalues)
+}
+
 func (client *Client) Hmset(hash string, keyvalues ...string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHmset(client.getConnectPool(), hash, keyvalues)
+}
+
+func executeHmset(pool *ConnPool, hash string, keyvalues []string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -40,8 +79,21 @@ func (client *Client) Hmset(hash string, keyvalues ...string) (interface{}, erro
 	return handler.HandleReply(result)
 }
 
+func (cluster *Cluster) Hmget(hash string, keys ...string) (interface{}, error) {
+	result, err := executeHmget(cluster.RandomSelect(), hash, keys)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHmget(cluster.SelectOne(result.(string)), hash, keys)
+}
+
 func (client *Client) Hmget(hash string, keys ...string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHmget(client.getConnectPool(), hash, keys)
+}
+
+func executeHmget(pool *ConnPool, hash string, keys []string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -52,8 +104,21 @@ func (client *Client) Hmget(hash string, keys ...string) (interface{}, error) {
 	return handler.HandleReply(result)
 }
 
+func (cluster *Cluster) Hgetall(hash string) (interface{}, error) {
+	result, err := executeHgetall(cluster.RandomSelect(), hash)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHgetall(cluster.SelectOne(result.(string)), hash)
+}
+
 func (client *Client) Hgetall(hash string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHgetall(client.getConnectPool(), hash)
+}
+
+func executeHgetall(pool *ConnPool, hash string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -63,8 +128,21 @@ func (client *Client) Hgetall(hash string) (interface{}, error) {
 	return handler.HandleReply(result)
 }
 
+func (cluster *Cluster) Hexists(hash string, key string) (interface{}, error) {
+	result, err := executeHexists(cluster.RandomSelect(), hash, key)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHexists(cluster.SelectOne(result.(string)), hash, key)
+}
+
 func (client *Client) Hexists(hash string, key string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHexists(client.getConnectPool(), hash, key)
+}
+
+func executeHexists(pool *ConnPool, hash string, key string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -74,8 +152,21 @@ func (client *Client) Hexists(hash string, key string) (interface{}, error) {
 	return handler.HandleReply(result)
 }
 
+func (cluster *Cluster) Hdel(hash string, key string) (interface{}, error) {
+	result, err := executeHdel(cluster.RandomSelect(), hash, key)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHdel(cluster.SelectOne(result.(string)), hash, key)
+}
+
 func (client *Client) Hdel(hash string, key string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHdel(client.getConnectPool(), hash, key)
+}
+
+func executeHdel(pool *ConnPool, hash string, key string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -85,8 +176,21 @@ func (client *Client) Hdel(hash string, key string) (interface{}, error) {
 	return handler.HandleReply(result)
 }
 
+func (cluster *Cluster) Hkeys(hash string) (interface{}, error) {
+	result, err := executeHkeys(cluster.RandomSelect(), hash)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHkeys(cluster.SelectOne(result.(string)), hash)
+}
+
 func (client *Client) Hkeys(hash string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHkeys(client.getConnectPool(), hash)
+}
+
+func executeHkeys(pool *ConnPool, hash string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -96,8 +200,21 @@ func (client *Client) Hkeys(hash string) (interface{}, error) {
 	return handler.HandleReply(result)
 }
 
+func (cluster *Cluster) Hvalues(hash string) (interface{}, error) {
+	result, err := executeHvalues(cluster.RandomSelect(), hash)
+	if err.Error() != protocol.MOVED {
+		return result, err
+	}
+
+	//重定向到新的节点
+	return executeHvalues(cluster.SelectOne(result.(string)), hash)
+}
+
 func (client *Client) Hvalues(hash string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHvalues(client.getConnectPool(), hash)
+}
+
+func executeHvalues(pool *ConnPool, hash string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
@@ -108,7 +225,10 @@ func (client *Client) Hvalues(hash string) (interface{}, error) {
 }
 
 func (client *Client) Hlen(hash string) (interface{}, error) {
-	pool := client.getConnectPool()
+	return executeHlen(client.getConnectPool(), hash)
+}
+
+func executeHlen(pool *ConnPool, hash string) (interface{}, error) {
 	conn, err := GetConn(pool)
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")

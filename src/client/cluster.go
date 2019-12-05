@@ -1,5 +1,10 @@
 package client
 
+import (
+	"time"
+	"math/rand"
+)
+
 /**
  * 节点
  * master：主节点ip+port
@@ -22,8 +27,8 @@ type ClusterConfig struct {
  * clusterPool key：连接串 value:连接池
  */
 type Cluster struct {
-	heartBeatInterval int
-	clusterPool       map[string]*ConnPool
+	config      *ClusterConfig
+	clusterPool map[string]*ConnPool
 }
 
 /**
@@ -37,14 +42,32 @@ func NewCluster(clusterConfig ClusterConfig) *Cluster {
 
 	for _, node := range nodes {
 		var config = ConnConfig{node.Url, node.Pwd}
-		pool,_ := NewConnPool(node.InitActive, config)
+		pool, _ := NewConnPool(node.InitActive, config)
 		clusterPool[node.Url] = pool
 	}
-	cluster.heartBeatInterval = clusterConfig.HeartBeatInterval
+	cluster.config = &clusterConfig
 	cluster.clusterPool = clusterPool
 	return &cluster
 }
 
-func (cluster *Cluster) GetClusterPool()map[string]*ConnPool{
+func (cluster *Cluster) GetClusterPool() map[string]*ConnPool {
 	return cluster.clusterPool
+}
+
+func (cluster *Cluster) GetClusterNodesInfo() []*Node {
+	return cluster.config.Nodes
+}
+
+func (cluster *Cluster) RandomSelect() *ConnPool{
+	pools := cluster.GetClusterPool()
+	nodes := cluster.GetClusterNodesInfo()
+	//负载均衡，随机选择一个节点执行访问
+	rand.Seed(time.Now().UnixNano())
+	nodeId := rand.Intn(len(nodes))
+	pool := pools[nodes[nodeId].Url]
+	return pool
+}
+
+func (cluster *Cluster) SelectOne(url string) *ConnPool{
+	return cluster.GetClusterPool()[url]
 }

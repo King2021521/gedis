@@ -2,8 +2,9 @@ package main
 
 import (
 	. "client"
-	"fmt"
+	//"fmt"
 	"net"
+	"fmt"
 )
 
 func main() {
@@ -17,11 +18,8 @@ func main() {
 	nodes := []*Node{&node7000, &node7001, &node7002, &node7003, &node7004, &node7005}
 	var clusterConfig = ClusterConfig{nodes,10}
 	cluster := NewCluster(clusterConfig)
-	map1:= cluster.GetClusterPool()
-	pool:=map1["127.0.0.1:7005"]
-	fmt.Println()
-	fmt.Println(BuildClient(pool).Set("name","asdadad"))
-	fmt.Println(BuildClient(pool).Get("name"))
+	value,err:=cluster.Get("name")
+	fmt.Println(value, err)
 }
 
 func getConn() *net.TCPConn {

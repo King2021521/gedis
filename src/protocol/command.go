@@ -9,7 +9,7 @@ const CRLF = "\r\n"
 const BLANK = ""
 const OK = "+OK\r\n"
 const NONEXIST = "$-1"
-
+const MOVED = "-MOVED"
 const PING = "PING"
 const SET = "SET"
 const GET = "GET"

@@ -25,6 +25,6 @@ func Connect(server string) *net.TCPConn{
 		os.Exit(1)
 	}
 
-	fmt.Println("connection success")
+	fmt.Printf("server [%s] connect success\n", server)
 	return conn
 }
