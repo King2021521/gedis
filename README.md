@@ -32,6 +32,7 @@ func main(){
 连接池管理  
 keepalive支持  
 redisTemplate提供多种命令支持  
+cluster的支持  
 更多内容持续更新中  
 
 author: tony  

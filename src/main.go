@@ -2,7 +2,6 @@ package main
 
 import (
 	. "client"
-	//"fmt"
 	"net"
 	"fmt"
 )
