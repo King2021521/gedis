@@ -8,7 +8,7 @@ import (
 )
 
 //默认心跳检测轮询时间间隔，单位s
-var DEFAULT_HEART_BEAT_INTERVAL = 10
+var defaultHeartBeatInterval = 10
 
 /**
  * 节点
@@ -89,7 +89,7 @@ func (cluster *Cluster) heartBeat() {
 	clusterPool := cluster.GetClusterPool()
 	interval := cluster.config.HeartBeatInterval
 	if interval <= 0 {
-		interval = DEFAULT_HEART_BEAT_INTERVAL
+		interval = defaultHeartBeatInterval
 	}
 	var nodes = make(map[string]*Node)
 
