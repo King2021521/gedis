@@ -2,28 +2,47 @@
 golang redis client  
 ##demo  
 ```
-func main(){
-    var config = tcp.ConnConfig{"127.0.0.1:6379","123456"}
-	pool,err:=tcp.NewConnPool(1,config)
-	if err!=nil{
-		fmt.Println(err)
-	}
+package main
 
-	conn,_:=tcp.GetConn(pool)
-	fmt.Println(conn.RemoteAddr())
-	sendResult := template.Set("name", "james", conn)
-	fmt.Println("send result:" + sendResult)
-	result := template.Get("name", conn)
-	fmt.Println("get result:" + result)
+import (
+	. "client"
+	"net"
+	"fmt"
+	"time"
+)
 
-	pool.PutConn(conn)
+func main() {
+	testCluster()
+	time.Sleep(time.Duration(100)*time.Second)
+}
+//集群版
+func testCluster(){
+	var node7000 = Node{"127.0.0.1:7000", "123456", 10}
+	var node7001 = Node{"127.0.0.1:7001", "123456", 10}
+	var node7002 = Node{"127.0.0.1:7002", "123456", 10}
+	var node7003 = Node{"127.0.0.1:7003", "123456", 10}
+	var node7004 = Node{"127.0.0.1:7004", "123456", 10}
+	var node7005 = Node{"127.0.0.1:7005", "123456", 10}
 
-	conn1,_:=tcp.GetConn(pool)
-	fmt.Println(conn1.RemoteAddr())
-	sendResult1 := template.Set("name", "james", conn)
-	fmt.Println("send result:" + sendResult1)
-	result1 := template.Get("name", conn)
-	fmt.Println("get result:" + result1)
+	nodes := []*Node{&node7000, &node7001, &node7002, &node7003, &node7004, &node7005}
+	var clusterConfig = ClusterConfig{nodes,10}
+	cluster := NewCluster(clusterConfig)
+	value,err:=cluster.Get("name")
+	fmt.Println(value, err)
+}
+
+func getConn() *net.TCPConn {
+	var config = ConnConfig{"127.0.0.1:6379", "root"}
+	pool := NewSingleConnPool(1, config)
+	conn, _ := GetConn(pool)
+	return conn
+}
+//单机版
+func getClient() *Client {
+	var config = ConnConfig{"127.0.0.1:7002", "123456"}
+	pool := NewSingleConnPool(1, config)
+
+	return BuildClient(pool)
 }
 ```  
 
