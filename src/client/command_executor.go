@@ -6,7 +6,6 @@ import (
 	"protocol"
 	"strconv"
 	"fmt"
-	"os"
 )
 
 func SendCommand(conn *net.TCPConn, cmd string, a ...[]byte) string {
@@ -35,8 +34,8 @@ func send(conn *net.TCPConn, content bytes.Buffer) string {
 	_, err := conn.Write(content.Bytes())
 
 	if err != nil {
-		fmt.Println(conn.RemoteAddr().String(), "server response")
-		os.Exit(1)
+		fmt.Println(conn.RemoteAddr().String(), "server response", err.Error())
+		return err.Error()
 	}
 
 	buffer := make([]byte, 1024)
@@ -44,7 +43,7 @@ func send(conn *net.TCPConn, content bytes.Buffer) string {
 	msg, err := conn.Read(buffer)
 	if err != nil {
 		fmt.Println(conn.RemoteAddr().String(), "server response:"+err.Error())
-		os.Exit(1)
+		return err.Error()
 	}
 	return string(buffer[:msg])
 }

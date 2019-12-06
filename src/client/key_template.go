@@ -101,3 +101,17 @@ func executeTtl(pool *ConnPool, key string) (interface{}, error) {
 	result := SendCommand(conn, protocol.TTL, protocol.SafeEncode(key))
 	return handler.HandleReply(result)
 }
+
+func (client *Client) Ping() (interface{}, error) {
+	return executePing(client.getConnectPool())
+}
+
+func executePing(pool *ConnPool)(interface{}, error){
+	conn, err := GetConn(pool)
+	if err != nil {
+		return nil, fmt.Errorf("get conn fail")
+	}
+	defer pool.PutConn(conn)
+	result := SendCommand(conn, protocol.PING)
+	return handler.HandleReply(result)
+}

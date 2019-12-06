@@ -60,7 +60,7 @@ func HandleAsteriskReply(result string) (interface{}, error) {
 }
 
 func handlePlusReply(result string) (interface{}, error) {
-	if result != protocol.OK {
+	if result != protocol.OK && !strings.HasPrefix(result, protocol.PLUSBYTE+protocol.PONG) {
 		return nil, fmt.Errorf(result)
 	}
 	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.PLUSBYTE, protocol.BLANK), nil

@@ -14,15 +14,15 @@ func Connect(server string) *net.TCPConn{
 
 	if err != nil {
 		fmt.Println(os.Stderr, "Fatal error: ", err)
-		os.Exit(1)
+		return nil
 	}
 
 	//建立服务器连接
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 
 	if err != nil {
-		fmt.Println(conn.RemoteAddr().String(), os.Stderr, "Fatal error:", err)
-		os.Exit(1)
+		fmt.Println(os.Stderr, "Fatal error:", err)
+		return nil
 	}
 
 	fmt.Printf("server [%s] connect success\n", server)

@@ -4,9 +4,15 @@ import (
 	. "client"
 	"net"
 	"fmt"
+	"time"
 )
 
 func main() {
+	testCluster()
+	time.Sleep(time.Duration(100)*time.Second)
+}
+
+func testCluster(){
 	var node7000 = Node{"127.0.0.1:7000", "123456", 10}
 	var node7001 = Node{"127.0.0.1:7001", "123456", 10}
 	var node7002 = Node{"127.0.0.1:7002", "123456", 10}
