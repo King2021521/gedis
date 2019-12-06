@@ -36,6 +36,7 @@ redisTemplate提供多种命令支持
 cluster支持  
 loadbalance支持  
 heartBeat支持  
+连接池的动态扩容（待实现）  
 更多内容持续更新中  
 
 author: tony  
