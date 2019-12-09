@@ -2,8 +2,8 @@ package client
 
 import (
 	"net"
-	"fmt"
 	"os"
+	"log"
 )
 
 /**
@@ -13,7 +13,7 @@ func Connect(server string) *net.TCPConn{
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", server)
 
 	if err != nil {
-		fmt.Println(os.Stderr, "Fatal error: ", err)
+		log.Println(os.Stderr, "Fatal error: ", err)
 		return nil
 	}
 
@@ -21,10 +21,10 @@ func Connect(server string) *net.TCPConn{
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 
 	if err != nil {
-		fmt.Println(os.Stderr, "Fatal error:", err)
+		log.Println(os.Stderr, "Fatal error:", err)
 		return nil
 	}
 
-	fmt.Printf("server [%s] connect success\n", server)
+	log.Printf("server [%s] connect success\n", server)
 	return conn
 }

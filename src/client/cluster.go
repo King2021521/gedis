@@ -3,9 +3,9 @@ package client
 import (
 	"time"
 	"math/rand"
-	"fmt"
 	"github.com/emirpasic/gods/lists/arraylist"
 	"sync"
+	"log"
 )
 
 //默认心跳检测轮询时间间隔，单位s
@@ -110,14 +110,14 @@ func (cluster *Cluster) heartBeat() {
 		for url, pool := range clusterPool {
 			result, err := executePing(pool)
 			if err != nil {
-				fmt.Printf("节点[%s] 健康检查异常，原因[%s], 节点将被移除\n", url, err)
+				log.Printf("节点[%s] 健康检查异常，原因[%s], 节点将被移除\n", url, err)
 				//加锁
 				m.Lock()
 				failNodes.Add(nodes[url])
 				delete(clusterPool, url)
 				m.Unlock()
 			} else {
-				fmt.Printf("节点[%s] 健康检查结果[%s]\n", url, result)
+				log.Printf("节点[%s] 健康检查结果[%s]\n", url, result)
 			}
 		}
 		//恢复检测
@@ -144,7 +144,7 @@ func recover(failNodes arraylist.List, clusterPool map[string]*ConnPool) {
 			clusterPool[node.Url] = pool
 			failNodes.Remove(iterator.Index())
 			m.Unlock()
-			fmt.Printf("节点[%s] 已重连\n", node.Url)
+			log.Printf("节点[%s] 已重连\n", node.Url)
 		}
 	}
 }
