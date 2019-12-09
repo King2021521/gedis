@@ -5,10 +5,13 @@ import (
 	"math/rand"
 	"fmt"
 	"github.com/emirpasic/gods/lists/arraylist"
+	"sync"
 )
 
 //默认心跳检测轮询时间间隔，单位s
 var defaultHeartBeatInterval = 10
+
+var m *sync.RWMutex
 
 /**
  * 节点
@@ -86,6 +89,10 @@ func (cluster *Cluster) SelectOne(url string) *ConnPool {
  * 定时轮询失败节点队列，检测节点是否已恢复连接，若恢复，则重新创建连接池，并从失败队列中移除
  */
 func (cluster *Cluster) heartBeat() {
+	if m==nil {
+		m = new(sync.RWMutex)
+	}
+
 	clusterPool := cluster.GetClusterPool()
 	interval := cluster.config.HeartBeatInterval
 	if interval <= 0 {
@@ -104,8 +111,11 @@ func (cluster *Cluster) heartBeat() {
 			result, err := executePing(pool)
 			if err != nil {
 				fmt.Printf("节点[%s] 健康检查异常，原因[%s], 节点将被移除\n", url, err)
+				//加锁
+				m.Lock()
 				failNodes.Add(nodes[url])
 				delete(clusterPool, url)
+				m.Unlock()
 			} else {
 				fmt.Printf("节点[%s] 健康检查结果[%s]\n", url, result)
 			}
@@ -129,8 +139,11 @@ func recover(failNodes arraylist.List, clusterPool map[string]*ConnPool) {
 			//节点重连,恢复连接
 			var config = ConnConfig{node.Url, node.Pwd}
 			pool, _ := NewConnPool(node.InitActive, config)
+			//加锁
+			m.Lock()
 			clusterPool[node.Url] = pool
 			failNodes.Remove(iterator.Index())
+			m.Unlock()
 			fmt.Printf("节点[%s] 已重连\n", node.Url)
 		}
 	}
