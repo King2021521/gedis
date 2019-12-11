@@ -2,10 +2,9 @@ package client
 
 import (
 	"time"
-	"math/rand"
-	"github.com/emirpasic/gods/lists/arraylist"
 	"sync"
 	"log"
+	"fmt"
 )
 
 //默认心跳检测轮询时间间隔，单位s
@@ -59,6 +58,9 @@ func NewCluster(clusterConfig ClusterConfig) *Cluster {
 	defer func() {
 		go cluster.heartBeat()
 	}()
+	if m==nil {
+		m = new(sync.RWMutex)
+	}
 	return &cluster
 }
 
@@ -71,16 +73,21 @@ func (cluster *Cluster) GetClusterNodesInfo() []*Node {
 }
 
 func (cluster *Cluster) RandomSelect() *ConnPool {
+	m.RLock()
+	defer m.RUnlock()
 	pools := cluster.GetClusterPool()
-	nodes := cluster.GetClusterNodesInfo()
-	//负载均衡，随机选择一个节点执行访问
-	rand.Seed(time.Now().UnixNano())
-	nodeId := rand.Intn(len(nodes))
-	pool := pools[nodes[nodeId].Url]
-	return pool
+	for _,pool:= range pools{
+		if pool !=nil{
+			return pool
+		}
+	}
+	fmt.Errorf("none pool can be used")
+	return nil
 }
 
 func (cluster *Cluster) SelectOne(url string) *ConnPool {
+	m.RLock()
+	defer m.RUnlock()
 	return cluster.GetClusterPool()[url]
 }
 
@@ -89,10 +96,6 @@ func (cluster *Cluster) SelectOne(url string) *ConnPool {
  * 定时轮询失败节点队列，检测节点是否已恢复连接，若恢复，则重新创建连接池，并从失败队列中移除
  */
 func (cluster *Cluster) heartBeat() {
-	if m==nil {
-		m = new(sync.RWMutex)
-	}
-
 	clusterPool := cluster.GetClusterPool()
 	interval := cluster.config.HeartBeatInterval
 	if interval <= 0 {
@@ -105,7 +108,7 @@ func (cluster *Cluster) heartBeat() {
 		nodes[node.Url] = node
 	}
 
-	var failNodes arraylist.List
+	var failNodes = make(map[string]*Node)
 	for {
 		for url, pool := range clusterPool {
 			result, err := executePing(pool)
@@ -113,7 +116,8 @@ func (cluster *Cluster) heartBeat() {
 				log.Printf("节点[%s] 健康检查异常，原因[%s], 节点将被移除\n", url, err)
 				//加锁
 				m.Lock()
-				failNodes.Add(nodes[url])
+				time.Sleep(time.Duration(5)*time.Second)
+				failNodes[url] = nodes[url]
 				delete(clusterPool, url)
 				m.Unlock()
 			} else {
@@ -130,21 +134,19 @@ func (cluster *Cluster) heartBeat() {
 /**
  * 检测fail节点是否已恢复正常
  */
-func recover(failNodes arraylist.List, clusterPool map[string]*ConnPool) {
-	iterator := failNodes.Iterator()
-	for iterator.Next() {
-		node := iterator.Value().(*Node)
-		conn := Connect(node.Url)
+func recover(failNodes map[string]*Node, clusterPool map[string]*ConnPool) {
+	for url,node:=range failNodes{
+		conn := Connect(url)
 		if conn != nil {
 			//节点重连,恢复连接
-			var config = ConnConfig{node.Url, node.Pwd}
+			var config = ConnConfig{url, node.Pwd}
 			pool, _ := NewConnPool(node.InitActive, config)
 			//加锁
 			m.Lock()
 			clusterPool[node.Url] = pool
-			failNodes.Remove(iterator.Index())
+			delete(failNodes,url)
 			m.Unlock()
-			log.Printf("节点[%s] 已重连\n", node.Url)
+			log.Printf("节点[%s] 已重连\n", url)
 		}
 	}
 }
