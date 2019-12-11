@@ -7,6 +7,10 @@ import (
 	"protocol"
 )
 
+const defaultMaxActive = 100
+const defaultMinActive = 5
+const defaultIntActive = 10
+
 type ConnConfig struct {
 	ConnString string
 	Pwd        string
@@ -39,15 +43,14 @@ func NewSingleConnPool(config ConnConfig) *ConnPool {
  * 初始化连接池
  */
 func NewConnPool(config ConnConfig) (*ConnPool, error) {
-	if config.InitActive <= 0 {
-		return nil, errors.New("maxActive must gt than 0")
-	}
+	config.validate()
 
 	var pool ConnPool
-	channel := make(chan *net.TCPConn, config.InitActive)
 	pool.initActive = config.InitActive
 	pool.minActive = config.MinActive
 	pool.maxActive = config.MaxActive
+
+	channel := make(chan *net.TCPConn, config.InitActive)
 
 	for index := 0; index < config.InitActive; index++ {
 		//初始化一个连接
@@ -62,6 +65,24 @@ func NewConnPool(config ConnConfig) (*ConnPool, error) {
 
 	pool.connPool = channel
 	return &pool, nil
+}
+
+func (config *ConnConfig) validate() {
+	if config.InitActive < 0 {
+		config.InitActive = defaultIntActive
+	}
+	if config.MinActive < 0 {
+		config.MinActive = defaultMinActive
+	}
+	if config.MaxActive < 0 {
+		config.MaxActive = defaultMaxActive
+	}
+	if config.MinActive > config.InitActive {
+		config.MinActive = config.InitActive
+	}
+	if config.MaxActive < config.InitActive {
+		config.MaxActive = config.InitActive
+	}
 }
 
 func auth(conn *net.TCPConn, pwd string) {
@@ -98,18 +119,18 @@ func (pool *ConnPool) PutConn(conn *net.TCPConn) error {
 /**
  * 返回连接池当前连接数
  */
-func (pool *ConnPool)PoolSize() int {
+func (pool *ConnPool) PoolSize() int {
 	return len(pool.connPool)
 }
 
-func (pool *ConnPool) setMaxActive(maxActive int){
+func (pool *ConnPool) setMaxActive(maxActive int) {
 	pool.maxActive = maxActive
 }
 
-func (pool *ConnPool) setMinActive(minActive int){
+func (pool *ConnPool) setMinActive(minActive int) {
 	pool.minActive = minActive
 }
 
-func (pool *ConnPool) setInitActive(initActive int){
+func (pool *ConnPool) setInitActive(initActive int) {
 	pool.initActive = initActive
 }
