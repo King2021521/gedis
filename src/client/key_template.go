@@ -8,7 +8,7 @@ import (
 
 func (cluster *Cluster) Keys(regex string) (interface{}, error) {
 	result, err := executeKeys(cluster.RandomSelect(), regex)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -21,7 +21,7 @@ func (client *Client) Keys(regex string) (interface{}, error) {
 }
 
 func executeKeys(pool *ConnPool, regex string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -32,7 +32,7 @@ func executeKeys(pool *ConnPool, regex string) (interface{}, error) {
 
 func (cluster *Cluster) Expire(key string, value int64) (interface{}, error) {
 	result, err := executeExpire(cluster.RandomSelect(), key, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -45,7 +45,7 @@ func (client *Client) Expire(key string, value int64) (interface{}, error) {
 }
 
 func executeExpire(pool *ConnPool, key string, value int64) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -56,7 +56,7 @@ func executeExpire(pool *ConnPool, key string, value int64) (interface{}, error)
 
 func (cluster *Cluster) Del(key string) (interface{}, error) {
 	result, err := executeDel(cluster.RandomSelect(), key)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -69,7 +69,7 @@ func (client *Client) Del(key string) (interface{}, error) {
 }
 
 func executeDel(pool *ConnPool, key string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -80,7 +80,7 @@ func executeDel(pool *ConnPool, key string) (interface{}, error) {
 
 func (cluster *Cluster) Ttl(key string) (interface{}, error) {
 	result, err := executeTtl(cluster.RandomSelect(), key)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -93,7 +93,7 @@ func (client *Client) Ttl(key string) (interface{}, error) {
 }
 
 func executeTtl(pool *ConnPool, key string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -107,7 +107,7 @@ func (client *Client) Ping() (interface{}, error) {
 }
 
 func executePing(pool *ConnPool)(interface{}, error){
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}

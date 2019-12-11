@@ -8,7 +8,7 @@ import (
 
 func (cluster *Cluster) Auth(pwd string) (interface{}, error) {
 	result, err := executeAuth(cluster.RandomSelect(), pwd)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -24,7 +24,7 @@ func (client *Client) Auth(pwd string) (interface{}, error) {
 }
 
 func executeAuth(pool *ConnPool, pwd string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -35,7 +35,7 @@ func executeAuth(pool *ConnPool, pwd string) (interface{}, error) {
 
 func (cluster *Cluster) Set(key string, value string) (interface{}, error) {
 	result, err := executeSet(cluster.RandomSelect(), key, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -48,7 +48,7 @@ func (client *Client) Set(key string, value string) (interface{}, error) {
 }
 
 func executeSet(pool *ConnPool, key string, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -59,7 +59,7 @@ func executeSet(pool *ConnPool, key string, value string) (interface{}, error) {
 
 func (cluster *Cluster) Get(key string) (interface{}, error) {
 	value, err := executeGet(cluster.RandomSelect(), key)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return value, err
 	}
 
@@ -73,7 +73,7 @@ func (client *Client) Get(key string) (interface{}, error) {
 }
 
 func executeGet(pool *ConnPool, key string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -84,7 +84,7 @@ func executeGet(pool *ConnPool, key string) (interface{}, error) {
 
 func (cluster *Cluster) Mset(keyvalues ...string) (interface{}, error) {
 	value, err := executeMset(cluster.RandomSelect(), keyvalues)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return value, err
 	}
 
@@ -97,7 +97,7 @@ func (client *Client) Mset(keyvalues ...string) (interface{}, error) {
 }
 
 func executeMset(pool *ConnPool, keyvalues []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -109,7 +109,7 @@ func executeMset(pool *ConnPool, keyvalues []string) (interface{}, error) {
 
 func (cluster *Cluster) Mget(keys ...string) (interface{}, error) {
 	value, err := executeMget(cluster.RandomSelect(), keys)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return value, err
 	}
 
@@ -122,7 +122,7 @@ func (client *Client) Mget(keys ...string) (interface{}, error) {
 }
 
 func executeMget(pool *ConnPool, keys []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -134,7 +134,7 @@ func executeMget(pool *ConnPool, keys []string) (interface{}, error) {
 
 func (cluster *Cluster) Setnx(key string, value string) (interface{}, error) {
 	result, err := executeSetnx(cluster.RandomSelect(), key, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -147,7 +147,7 @@ func (client *Client) Setnx(key string, value string) (interface{}, error) {
 }
 
 func executeSetnx(pool *ConnPool, key string, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -162,7 +162,7 @@ func (client *Client) Incr(key string) (interface{}, error) {
 
 func (cluster *Cluster) Incr(key string) (interface{}, error) {
 	result, err := executeIncr(cluster.RandomSelect(), key)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -171,7 +171,7 @@ func (cluster *Cluster) Incr(key string) (interface{}, error) {
 }
 
 func executeIncr(pool *ConnPool, key string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -182,7 +182,7 @@ func executeIncr(pool *ConnPool, key string) (interface{}, error) {
 
 func (cluster *Cluster) Decr(key string) (interface{}, error) {
 	result, err := executeDecr(cluster.RandomSelect(), key)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -195,7 +195,7 @@ func (client *Client) Decr(key string) (interface{}, error) {
 }
 
 func executeDecr(pool *ConnPool, key string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -206,7 +206,7 @@ func executeDecr(pool *ConnPool, key string) (interface{}, error) {
 
 func (cluster *Cluster) Setex(key string, time int64, value string) (interface{}, error) {
 	result, err := executeSetex(cluster.RandomSelect(), key, time, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -219,7 +219,7 @@ func (client *Client) Setex(key string, time int64, value string) (interface{}, 
 }
 
 func executeSetex(pool *ConnPool, key string, time int64, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}

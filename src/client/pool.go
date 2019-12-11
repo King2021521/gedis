@@ -10,11 +10,16 @@ import (
 type ConnConfig struct {
 	ConnString string
 	Pwd        string
+	InitActive int
+	MinActive  int
+	MaxActive  int
 }
 
 type ConnPool struct {
 	connPool   chan *net.TCPConn
 	initActive int
+	minActive  int
+	maxActive  int
 }
 
 var pool *ConnPool
@@ -23,9 +28,9 @@ var oSingle sync.Once
 /**
  * 单例的连接池（线程安全）
  */
-func NewSingleConnPool(initActive int, config ConnConfig) *ConnPool {
+func NewSingleConnPool(config ConnConfig) *ConnPool {
 	oSingle.Do(func() {
-		pool, _ = NewConnPool(initActive, config)
+		pool, _ = NewConnPool(config)
 	})
 	return pool
 }
@@ -33,16 +38,18 @@ func NewSingleConnPool(initActive int, config ConnConfig) *ConnPool {
 /**
  * 初始化连接池
  */
-func NewConnPool(initActive int, config ConnConfig) (*ConnPool, error) {
-	if initActive <= 0 {
+func NewConnPool(config ConnConfig) (*ConnPool, error) {
+	if config.InitActive <= 0 {
 		return nil, errors.New("maxActive must gt than 0")
 	}
 
 	var pool ConnPool
-	channel := make(chan *net.TCPConn, initActive)
-	pool.initActive = initActive
+	channel := make(chan *net.TCPConn, config.InitActive)
+	pool.initActive = config.InitActive
+	pool.minActive = config.MinActive
+	pool.maxActive = config.MaxActive
 
-	for index := 0; index < initActive; index++ {
+	for index := 0; index < config.InitActive; index++ {
 		//初始化一个连接
 		conn := Connect(config.ConnString)
 		//设置keepalive
@@ -57,15 +64,15 @@ func NewConnPool(initActive int, config ConnConfig) (*ConnPool, error) {
 	return &pool, nil
 }
 
-func auth(conn *net.TCPConn, pwd string){
+func auth(conn *net.TCPConn, pwd string) {
 	SendCommand(conn, protocol.AUTH, protocol.SafeEncode(pwd))
 }
 
 /**
  * 从连接池中获取连接
  */
-func GetConn(pool *ConnPool) (*net.TCPConn, error) {
-	if PoolSize(pool) == 0 {
+func (pool *ConnPool) GetConn() (*net.TCPConn, error) {
+	if pool.PoolSize() == 0 {
 		return nil, errors.New("连接数已不足")
 	}
 
@@ -91,6 +98,18 @@ func (pool *ConnPool) PutConn(conn *net.TCPConn) error {
 /**
  * 返回连接池当前连接数
  */
-func PoolSize(pool *ConnPool) int {
+func (pool *ConnPool)PoolSize() int {
 	return len(pool.connPool)
+}
+
+func (pool *ConnPool) setMaxActive(maxActive int){
+	pool.maxActive = maxActive
+}
+
+func (pool *ConnPool) setMinActive(minActive int){
+	pool.minActive = minActive
+}
+
+func (pool *ConnPool) setInitActive(initActive int){
+	pool.initActive = initActive
 }

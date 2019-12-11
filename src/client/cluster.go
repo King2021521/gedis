@@ -21,6 +21,8 @@ type Node struct {
 	Url        string
 	Pwd        string
 	InitActive int
+	MinActive  int
+	MaxActive  int
 }
 
 type ClusterConfig struct {
@@ -48,8 +50,8 @@ func NewCluster(clusterConfig ClusterConfig) *Cluster {
 	clusterPool := make(map[string]*ConnPool)
 
 	for _, node := range nodes {
-		var config = ConnConfig{node.Url, node.Pwd}
-		pool, _ := NewConnPool(node.InitActive, config)
+		var config = ConnConfig{node.Url, node.Pwd, node.InitActive, node.MinActive, node.MaxActive}
+		pool, _ := NewConnPool(config)
 		clusterPool[node.Url] = pool
 	}
 	cluster.config = &clusterConfig
@@ -58,7 +60,7 @@ func NewCluster(clusterConfig ClusterConfig) *Cluster {
 	defer func() {
 		go cluster.heartBeat()
 	}()
-	if m==nil {
+	if m == nil {
 		m = new(sync.RWMutex)
 	}
 	return &cluster
@@ -76,8 +78,8 @@ func (cluster *Cluster) RandomSelect() *ConnPool {
 	m.RLock()
 	defer m.RUnlock()
 	pools := cluster.GetClusterPool()
-	for _,pool:= range pools{
-		if pool !=nil{
+	for _, pool := range pools {
+		if pool != nil {
 			return pool
 		}
 	}
@@ -116,7 +118,7 @@ func (cluster *Cluster) heartBeat() {
 				log.Printf("节点[%s] 健康检查异常，原因[%s], 节点将被移除\n", url, err)
 				//加锁
 				m.Lock()
-				time.Sleep(time.Duration(5)*time.Second)
+				time.Sleep(time.Duration(5) * time.Second)
 				failNodes[url] = nodes[url]
 				delete(clusterPool, url)
 				m.Unlock()
@@ -135,16 +137,16 @@ func (cluster *Cluster) heartBeat() {
  * 检测fail节点是否已恢复正常
  */
 func recover(failNodes map[string]*Node, clusterPool map[string]*ConnPool) {
-	for url,node:=range failNodes{
+	for url, node := range failNodes {
 		conn := Connect(url)
 		if conn != nil {
 			//节点重连,恢复连接
-			var config = ConnConfig{url, node.Pwd}
-			pool, _ := NewConnPool(node.InitActive, config)
+			var config = ConnConfig{url, node.Pwd,node.InitActive, node.MinActive, node.MaxActive}
+			pool, _ := NewConnPool(config)
 			//加锁
 			m.Lock()
 			clusterPool[node.Url] = pool
-			delete(failNodes,url)
+			delete(failNodes, url)
 			m.Unlock()
 			log.Printf("节点[%s] 已重连\n", url)
 		}

@@ -9,7 +9,7 @@ import (
 
 func (cluster *Cluster) Lpush(list string, elements ...string) (interface{}, error) {
 	result, err := executeLpush(cluster.RandomSelect(), list, elements)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -19,7 +19,7 @@ func (cluster *Cluster) Lpush(list string, elements ...string) (interface{}, err
 
 func (cluster *Cluster) Rpush(list string, elements ...string) (interface{}, error) {
 	result, err := executeRpush(cluster.RandomSelect(), list, elements)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -29,7 +29,7 @@ func (cluster *Cluster) Rpush(list string, elements ...string) (interface{}, err
 
 func (cluster *Cluster) Lrange(list string, start int64, end int64) (interface{}, error) {
 	result, err := executeLrange(cluster.RandomSelect(), list, start, end)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -39,7 +39,7 @@ func (cluster *Cluster) Lrange(list string, start int64, end int64) (interface{}
 
 func (cluster *Cluster) Lpop(list string) (interface{}, error) {
 	result, err := executeLpop(cluster.RandomSelect(), list)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -49,7 +49,7 @@ func (cluster *Cluster) Lpop(list string) (interface{}, error) {
 
 func (cluster *Cluster) Rpop(list string) (interface{}, error) {
 	result, err := executeRpop(cluster.RandomSelect(), list)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -59,7 +59,7 @@ func (cluster *Cluster) Rpop(list string) (interface{}, error) {
 
 func (cluster *Cluster) Llen(list string) (interface{}, error) {
 	result, err := executeLlen(cluster.RandomSelect(), list)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -74,7 +74,7 @@ func (cluster *Cluster) Llen(list string) (interface{}, error) {
  */
 func (cluster *Cluster) Lrem(list string, count int64, value string) (interface{}, error) {
 	result, err := executeLrem(cluster.RandomSelect(), list, count, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -84,7 +84,7 @@ func (cluster *Cluster) Lrem(list string, count int64, value string) (interface{
 
 func (cluster *Cluster) Lindex(list string, pos int64) (interface{}, error) {
 	result, err := executeLindex(cluster.RandomSelect(), list, pos)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -94,7 +94,7 @@ func (cluster *Cluster) Lindex(list string, pos int64) (interface{}, error) {
 
 func (cluster *Cluster) Lset(list string, pos int64, value string) (interface{}, error) {
 	result, err := executeLset(cluster.RandomSelect(), list, pos, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -107,7 +107,7 @@ func (cluster *Cluster) Lset(list string, pos int64, value string) (interface{},
  */
 func (cluster *Cluster) LinsertBefore(list string, target string, value string) (interface{}, error) {
 	result, err := executeLinsertBefore(cluster.RandomSelect(), list, target, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -120,7 +120,7 @@ func (cluster *Cluster) LinsertBefore(list string, target string, value string) 
  */
 func (cluster *Cluster) LinsertAfter(list string, target string, value string) (interface{}, error) {
 	result, err := executeLinsertAfter(cluster.RandomSelect(), list, target, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -184,7 +184,7 @@ func (client *Client) LinsertAfter(list string, target string, value string) (in
 }
 
 func executeLpush(pool *ConnPool, list string, elements []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -193,7 +193,7 @@ func executeLpush(pool *ConnPool, list string, elements []string) (interface{}, 
 }
 
 func executeRpush(pool *ConnPool, list string, elements []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -202,7 +202,7 @@ func executeRpush(pool *ConnPool, list string, elements []string) (interface{}, 
 }
 
 func executeLrange(pool *ConnPool, list string, start int64, end int64) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -212,7 +212,7 @@ func executeLrange(pool *ConnPool, list string, start int64, end int64) (interfa
 }
 
 func executeLpop(pool *ConnPool, list string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -221,7 +221,7 @@ func executeLpop(pool *ConnPool, list string) (interface{}, error) {
 }
 
 func executeRpop(pool *ConnPool, list string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -230,7 +230,7 @@ func executeRpop(pool *ConnPool, list string) (interface{}, error) {
 }
 
 func executeLlen(pool *ConnPool, list string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -245,7 +245,7 @@ func executeLlen(pool *ConnPool, list string) (interface{}, error) {
  *  count = 0 : 移除表中所有与 VALUE 相等的值。
  */
 func executeLrem(pool *ConnPool, list string, count int64, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -255,7 +255,7 @@ func executeLrem(pool *ConnPool, list string, count int64, value string) (interf
 }
 
 func executeLindex(pool *ConnPool, list string, pos int64) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -265,7 +265,7 @@ func executeLindex(pool *ConnPool, list string, pos int64) (interface{}, error) 
 }
 
 func executeLset(pool *ConnPool, list string, pos int64, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -278,7 +278,7 @@ func executeLset(pool *ConnPool, list string, pos int64, value string) (interfac
  * target 目标元素
  */
 func executeLinsertBefore(pool *ConnPool, list string, target string, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -291,7 +291,7 @@ func executeLinsertBefore(pool *ConnPool, list string, target string, value stri
  * target 目标元素
  */
 func executeLinsertAfter(pool *ConnPool, list string, target string, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}

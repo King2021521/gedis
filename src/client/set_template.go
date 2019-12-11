@@ -8,7 +8,7 @@ import (
 
 func (cluster *Cluster) Sadd(set string, elements ...string) (interface{}, error) {
 	result, err := executeSadd(cluster.RandomSelect(), set, elements)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -18,7 +18,7 @@ func (cluster *Cluster) Sadd(set string, elements ...string) (interface{}, error
 
 func (cluster *Cluster) Smembers(set string) (interface{}, error) {
 	result, err := executeSmembers(cluster.RandomSelect(), set)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -28,7 +28,7 @@ func (cluster *Cluster) Smembers(set string) (interface{}, error) {
 
 func (cluster *Cluster) Srem(set string, elements ...string) (interface{}, error) {
 	result, err := executeSrem(cluster.RandomSelect(), set, elements)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -38,7 +38,7 @@ func (cluster *Cluster) Srem(set string, elements ...string) (interface{}, error
 
 func (cluster *Cluster) Sismember(set string, value string) (interface{}, error) {
 	result, err := executeSismember(cluster.RandomSelect(), set, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -48,7 +48,7 @@ func (cluster *Cluster) Sismember(set string, value string) (interface{}, error)
 
 func (cluster *Cluster) Scard(set string) (interface{}, error) {
 	result, err := executeScard(cluster.RandomSelect(), set)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -58,7 +58,7 @@ func (cluster *Cluster) Scard(set string) (interface{}, error) {
 
 func (cluster *Cluster) Srandmembers(set string, count int64) (interface{}, error) {
 	result, err := executeSrandmembers(cluster.RandomSelect(), set, count)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -68,7 +68,7 @@ func (cluster *Cluster) Srandmembers(set string, count int64) (interface{}, erro
 
 func (cluster *Cluster) Spop(set string) (interface{}, error) {
 	result, err := executeSpop(cluster.RandomSelect(), set)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -81,7 +81,7 @@ func (cluster *Cluster) Spop(set string) (interface{}, error) {
  */
 func (cluster *Cluster) Sdiff(sets ... string) (interface{}, error) {
 	result, err := executeSdiff(cluster.RandomSelect(), sets)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -125,7 +125,7 @@ func (client *Client) Sdiff(sets ... string) (interface{}, error) {
 }
 
 func executeSadd(pool *ConnPool, set string, elements []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -136,7 +136,7 @@ func executeSadd(pool *ConnPool, set string, elements []string) (interface{}, er
 }
 
 func executeSmembers(pool *ConnPool, set string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -146,7 +146,7 @@ func executeSmembers(pool *ConnPool, set string) (interface{}, error) {
 }
 
 func executeSrem(pool *ConnPool, set string, elements []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -157,7 +157,7 @@ func executeSrem(pool *ConnPool, set string, elements []string) (interface{}, er
 }
 
 func executeSismember(pool *ConnPool, set string, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -167,7 +167,7 @@ func executeSismember(pool *ConnPool, set string, value string) (interface{}, er
 }
 
 func executeScard(pool *ConnPool, set string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -177,7 +177,7 @@ func executeScard(pool *ConnPool, set string) (interface{}, error) {
 }
 
 func executeSrandmembers(pool *ConnPool, set string, count int64) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -187,7 +187,7 @@ func executeSrandmembers(pool *ConnPool, set string, count int64) (interface{}, 
 }
 
 func executeSpop(pool *ConnPool, set string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -200,7 +200,7 @@ func executeSpop(pool *ConnPool, set string) (interface{}, error) {
  * 返回给定所有集合的差集
  */
 func executeSdiff(pool *ConnPool, sets []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}

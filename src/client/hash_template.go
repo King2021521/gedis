@@ -8,7 +8,7 @@ import (
 
 func (cluster *Cluster) Hset(hash string, key string, value string) (interface{}, error) {
 	result, err := executeHset(cluster.RandomSelect(), hash, key, value)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -21,7 +21,7 @@ func (client *Client) Hset(hash string, key string, value string) (interface{}, 
 }
 
 func executeHset(pool *ConnPool, hash string, key string, value string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -32,7 +32,7 @@ func executeHset(pool *ConnPool, hash string, key string, value string) (interfa
 
 func (cluster *Cluster) Hget(hash string, key string) (interface{}, error) {
 	result, err := executeHget(cluster.RandomSelect(), hash, key)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -45,7 +45,7 @@ func (client *Client) Hget(hash string, key string) (interface{}, error) {
 }
 
 func executeHget(pool *ConnPool, hash string, key string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -56,7 +56,7 @@ func executeHget(pool *ConnPool, hash string, key string) (interface{}, error) {
 
 func (cluster *Cluster) Hmset(hash string, keyvalues ...string) (interface{}, error) {
 	result, err := executeHmset(cluster.RandomSelect(), hash, keyvalues)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -69,7 +69,7 @@ func (client *Client) Hmset(hash string, keyvalues ...string) (interface{}, erro
 }
 
 func executeHmset(pool *ConnPool, hash string, keyvalues []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -81,7 +81,7 @@ func executeHmset(pool *ConnPool, hash string, keyvalues []string) (interface{},
 
 func (cluster *Cluster) Hmget(hash string, keys ...string) (interface{}, error) {
 	result, err := executeHmget(cluster.RandomSelect(), hash, keys)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -94,7 +94,7 @@ func (client *Client) Hmget(hash string, keys ...string) (interface{}, error) {
 }
 
 func executeHmget(pool *ConnPool, hash string, keys []string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -106,7 +106,7 @@ func executeHmget(pool *ConnPool, hash string, keys []string) (interface{}, erro
 
 func (cluster *Cluster) Hgetall(hash string) (interface{}, error) {
 	result, err := executeHgetall(cluster.RandomSelect(), hash)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -119,7 +119,7 @@ func (client *Client) Hgetall(hash string) (interface{}, error) {
 }
 
 func executeHgetall(pool *ConnPool, hash string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -130,7 +130,7 @@ func executeHgetall(pool *ConnPool, hash string) (interface{}, error) {
 
 func (cluster *Cluster) Hexists(hash string, key string) (interface{}, error) {
 	result, err := executeHexists(cluster.RandomSelect(), hash, key)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -143,7 +143,7 @@ func (client *Client) Hexists(hash string, key string) (interface{}, error) {
 }
 
 func executeHexists(pool *ConnPool, hash string, key string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -154,7 +154,7 @@ func executeHexists(pool *ConnPool, hash string, key string) (interface{}, error
 
 func (cluster *Cluster) Hdel(hash string, key string) (interface{}, error) {
 	result, err := executeHdel(cluster.RandomSelect(), hash, key)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -167,7 +167,7 @@ func (client *Client) Hdel(hash string, key string) (interface{}, error) {
 }
 
 func executeHdel(pool *ConnPool, hash string, key string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -178,7 +178,7 @@ func executeHdel(pool *ConnPool, hash string, key string) (interface{}, error) {
 
 func (cluster *Cluster) Hkeys(hash string) (interface{}, error) {
 	result, err := executeHkeys(cluster.RandomSelect(), hash)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -191,7 +191,7 @@ func (client *Client) Hkeys(hash string) (interface{}, error) {
 }
 
 func executeHkeys(pool *ConnPool, hash string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -202,7 +202,7 @@ func executeHkeys(pool *ConnPool, hash string) (interface{}, error) {
 
 func (cluster *Cluster) Hvalues(hash string) (interface{}, error) {
 	result, err := executeHvalues(cluster.RandomSelect(), hash)
-	if err.Error() != protocol.MOVED {
+	if err==nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -215,7 +215,7 @@ func (client *Client) Hvalues(hash string) (interface{}, error) {
 }
 
 func executeHvalues(pool *ConnPool, hash string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
@@ -229,7 +229,7 @@ func (client *Client) Hlen(hash string) (interface{}, error) {
 }
 
 func executeHlen(pool *ConnPool, hash string) (interface{}, error) {
-	conn, err := GetConn(pool)
+	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")
 	}
