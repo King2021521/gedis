@@ -42,6 +42,10 @@ type Cluster struct {
 	clusterPool map[string]*ConnPool
 }
 
+func init() {
+	LoggerInit()
+}
+
 /**
  * 初始化Cluster client
  */
