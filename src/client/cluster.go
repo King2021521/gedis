@@ -5,6 +5,8 @@ import (
 	"sync"
 	"log"
 	"fmt"
+	"protocol"
+	"client/handler"
 )
 
 //默认心跳检测轮询时间间隔，单位s
@@ -112,13 +114,12 @@ func (cluster *Cluster) heartBeat() {
 
 	var failNodes = make(map[string]*Node)
 	for {
-		for url, pool := range clusterPool {
-			result, err := executePing(pool)
+		for url := range clusterPool {
+			result, err := ping(nodes[url])
 			if err != nil {
 				log.Printf("节点[%s] 健康检查异常，原因[%s], 节点将被移除\n", url, err)
 				//加锁
 				m.Lock()
-				time.Sleep(time.Duration(5) * time.Second)
 				failNodes[url] = nodes[url]
 				delete(clusterPool, url)
 				m.Unlock()
@@ -133,6 +134,18 @@ func (cluster *Cluster) heartBeat() {
 	}
 }
 
+//ping redis server
+func ping(node *Node) (interface{}, error) {
+	conn := Connect(node.Url)
+	//设置keepalive
+	conn.SetKeepAlive(true)
+	//为当前连接授权
+	auth(conn, node.Pwd)
+	defer conn.Close()
+	result := SendCommand(conn, protocol.PING)
+	return handler.HandleReply(result)
+}
+
 /**
  * 检测fail节点是否已恢复正常
  */
@@ -141,7 +154,7 @@ func recover(failNodes map[string]*Node, clusterPool map[string]*ConnPool) {
 		conn := Connect(url)
 		if conn != nil {
 			//节点重连,恢复连接
-			var config = ConnConfig{url, node.Pwd,node.InitActive, node.MinActive, node.MaxActive}
+			var config = ConnConfig{url, node.Pwd, node.InitActive, node.MinActive, node.MaxActive}
 			pool, _ := NewConnPool(config)
 			//加锁
 			m.Lock()

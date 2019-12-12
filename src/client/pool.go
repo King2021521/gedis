@@ -5,11 +5,14 @@ import (
 	"net"
 	"sync"
 	"protocol"
+	"time"
+	"log"
 )
 
 const defaultMaxActive = 100
 const defaultMinActive = 5
 const defaultIntActive = 10
+const timeCheckPoolSeconds = 30
 
 type ConnConfig struct {
 	ConnString string
@@ -21,9 +24,7 @@ type ConnConfig struct {
 
 type ConnPool struct {
 	connPool   chan *net.TCPConn
-	initActive int
-	minActive  int
-	maxActive  int
+	connConfig ConnConfig
 }
 
 var pool *ConnPool
@@ -46,13 +47,17 @@ func NewConnPool(config ConnConfig) (*ConnPool, error) {
 	config.validate()
 
 	var pool ConnPool
-	pool.initActive = config.InitActive
-	pool.minActive = config.MinActive
-	pool.maxActive = config.MaxActive
+	pool.connConfig = config
 
 	channel := make(chan *net.TCPConn, config.InitActive)
+	create(channel, pool.connConfig, config.InitActive)
+	defer func() { go pool.startupMonitor() }()
+	pool.connPool = channel
+	return &pool, nil
+}
 
-	for index := 0; index < config.InitActive; index++ {
+func create(channel chan *net.TCPConn, config ConnConfig, size int) {
+	for index := 0; index < size; index++ {
 		//初始化一个连接
 		conn := Connect(config.ConnString)
 		//设置keepalive
@@ -62,9 +67,28 @@ func NewConnPool(config ConnConfig) (*ConnPool, error) {
 		//将连接加入连接池
 		channel <- conn
 	}
+}
 
-	pool.connPool = channel
-	return &pool, nil
+//连接池监控任务，当连接池的连接数量不足时，进行扩充；连接数过多时进行回收
+func (pool *ConnPool) startupMonitor() {
+	for {
+		time.Sleep(time.Duration(timeCheckPoolSeconds) * time.Second)
+		log.Printf("执行连接池连接数监控，当前节点：{%s}", pool.connConfig.ConnString)
+		size := pool.PoolSize()
+		log.Printf("节点{%s}当前连接数{%d}：", pool.connConfig.ConnString, size)
+		if size < pool.connConfig.MinActive {
+			//连接数不足
+			create(pool.connPool, pool.connConfig, pool.connConfig.MinActive-size)
+			continue
+		}
+		if size > pool.connConfig.MaxActive {
+			//回收过多的连接
+			for i := 0; i < (size - pool.connConfig.MaxActive); i++ {
+				conn := <-pool.connPool
+				conn.Close()
+			}
+		}
+	}
 }
 
 func (config *ConnConfig) validate() {
@@ -112,6 +136,7 @@ func (pool *ConnPool) PutConn(conn *net.TCPConn) error {
 	if conn == nil {
 		return errors.New("连接为空")
 	}
+
 	pool.connPool <- conn
 	return nil
 }
@@ -124,13 +149,13 @@ func (pool *ConnPool) PoolSize() int {
 }
 
 func (pool *ConnPool) setMaxActive(maxActive int) {
-	pool.maxActive = maxActive
+	pool.connConfig.MaxActive = maxActive
 }
 
 func (pool *ConnPool) setMinActive(minActive int) {
-	pool.minActive = minActive
+	pool.connConfig.MinActive = minActive
 }
 
 func (pool *ConnPool) setInitActive(initActive int) {
-	pool.initActive = initActive
+	pool.connConfig.InitActive = initActive
 }
