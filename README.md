@@ -46,16 +46,16 @@ func getClient() *Client {
 }
 ```  
 
-1.0特性：  
+1.0 特性：  
 基于原生golang开发  
 连接池管理  
-keepalive支持  
+keepalive  
 redisTemplate提供多种命令支持  
-2.0特性   
+2.0 特性   
 cluster支持  
 loadbalance支持  
 heartBeat支持  
-连接池的动态扩容（待实现）  
+连接池的监控及动态扩容  
 更多内容持续更新中  
 
 author: tony  
