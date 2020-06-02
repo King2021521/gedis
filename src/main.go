@@ -2,6 +2,7 @@ package main
 
 import (
 	. "client"
+	"fmt"
 	"net"
 	"time"
 	"math/rand"
@@ -9,8 +10,16 @@ import (
 )
 
 func main() {
-	testCluster()
-	time.Sleep(time.Duration(100)*time.Second)
+	/*testCluster()
+	time.Sleep(time.Duration(100)*time.Second)*/
+	client:=getClient()
+	multiResult,_:=client.Multi()
+	fmt.Println("开启事务：",multiResult)
+	client.Get("age")
+	client.Get("name")
+	client.Get("age")
+	execResult,_:=client.Discard()
+	fmt.Println("终止事务结果：",execResult)
 }
 
 func testCluster() {
@@ -44,7 +53,7 @@ func getConn() *net.TCPConn {
 }
 
 func getClient() *Client {
-	var config = ConnConfig{"127.0.0.1:7002", "123456",1,1,1}
+	var config = ConnConfig{"127.0.0.1:6379", "",1,1,1}
 	pool := NewSingleConnPool(config)
 
 	return BuildClient(pool)

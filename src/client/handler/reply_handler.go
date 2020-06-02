@@ -14,6 +14,7 @@ import (
  * 3、简单的$...
  * 4、+OK
  * 5、-ERR(WRONGTYPE...)
+ * 6、+QUEUED
  */
 func HandleReply(result string) (interface{}, error) {
 	if strings.HasPrefix(result, protocol.MOVED) {
@@ -60,7 +61,7 @@ func HandleAsteriskReply(result string) (interface{}, error) {
 }
 
 func handlePlusReply(result string) (interface{}, error) {
-	if result != protocol.OK && !strings.HasPrefix(result, protocol.PLUSBYTE+protocol.PONG) {
+	if result != protocol.OK && !strings.HasPrefix(result, protocol.PLUSBYTE+protocol.PONG) && !strings.HasPrefix(result, protocol.PLUSBYTE+protocol.QUEUED) {
 		return nil, fmt.Errorf(result)
 	}
 	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.PLUSBYTE, protocol.BLANK), nil
