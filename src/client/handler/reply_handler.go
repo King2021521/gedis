@@ -87,8 +87,31 @@ func handleMinusReply(result string) (interface{}, error) {
 	return strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.MINUS_BYTE, protocol.BLANK), nil
 }
 
+//访问集群模式时，处理响应的MOVED指令
 func handleMovedReply(result string) (interface{}, error) {
 	movedInfo := strings.ReplaceAll(strings.ReplaceAll(result, protocol.CRLF, protocol.BLANK), protocol.MINUS_BYTE, protocol.BLANK)
 	array := strings.Split(movedInfo, " ")
 	return array[2], fmt.Errorf(protocol.MOVED)
+}
+
+//处理事务执行结果
+func HandleTransactionReply(result string)(interface{}, error){
+	elements := strings.Split(result, protocol.CRLF)
+	var values []string
+	//解析事务批量执行的返回结果
+	for i := 1; i < len(elements); {
+		if elements[i] == protocol.BLANK {
+			i++
+			continue
+		}
+
+		if strings.HasPrefix(elements[i], protocol.DOLLARBYTE) {
+			values = append(values, elements[i+1])
+			i += 2
+		} else {
+			values = append(values, elements[i])
+			i++
+		}
+	}
+	return values, nil
 }
