@@ -12,8 +12,6 @@ import (
 //默认心跳检测轮询时间间隔，单位s
 var defaultHeartBeatInterval = 10
 
-var m *sync.RWMutex
-
 /**
  * 节点
  * master：主节点ip+port
@@ -40,6 +38,7 @@ type ClusterConfig struct {
 type Cluster struct {
 	config      *ClusterConfig
 	clusterPool map[string]*ConnPool
+	m *sync.RWMutex
 }
 
 func init() {
@@ -66,8 +65,8 @@ func NewCluster(clusterConfig ClusterConfig) *Cluster {
 	defer func() {
 		go cluster.heartBeat()
 	}()
-	if m == nil {
-		m = new(sync.RWMutex)
+	if cluster.m == nil {
+		cluster.m = new(sync.RWMutex)
 	}
 	return &cluster
 }
@@ -81,8 +80,8 @@ func (cluster *Cluster) GetClusterNodesInfo() []*Node {
 }
 
 func (cluster *Cluster) RandomSelect() *ConnPool {
-	m.RLock()
-	defer m.RUnlock()
+	cluster.m.RLock()
+	defer cluster.m.RUnlock()
 	pools := cluster.GetClusterPool()
 	for _, pool := range pools {
 		if pool != nil {
@@ -94,8 +93,8 @@ func (cluster *Cluster) RandomSelect() *ConnPool {
 }
 
 func (cluster *Cluster) SelectOne(url string) *ConnPool {
-	m.RLock()
-	defer m.RUnlock()
+	cluster.m.RLock()
+	defer cluster.m.RUnlock()
 	return cluster.GetClusterPool()[url]
 }
 
@@ -123,16 +122,16 @@ func (cluster *Cluster) heartBeat() {
 			if err != nil {
 				log.Printf("节点[%s] 健康检查异常，原因[%s], 节点将被移除\n", url, err)
 				//加锁
-				m.Lock()
+				cluster.m.Lock()
 				failNodes[url] = nodes[url]
 				delete(clusterPool, url)
-				m.Unlock()
+				cluster.m.Unlock()
 			} else {
 				log.Printf("节点[%s] 健康检查结果[%s]\n", url, result)
 			}
 		}
 		//恢复检测
-		recover(failNodes, clusterPool)
+		cluster.recover(failNodes, clusterPool)
 
 		time.Sleep(time.Duration(interval) * time.Second)
 	}
@@ -153,7 +152,7 @@ func ping(node *Node) (interface{}, error) {
 /**
  * 检测fail节点是否已恢复正常
  */
-func recover(failNodes map[string]*Node, clusterPool map[string]*ConnPool) {
+func (cluster *Cluster) recover(failNodes map[string]*Node, clusterPool map[string]*ConnPool) {
 	for url, node := range failNodes {
 		conn := Connect(url)
 		if conn != nil {
@@ -161,10 +160,10 @@ func recover(failNodes map[string]*Node, clusterPool map[string]*ConnPool) {
 			var config = ConnConfig{url, node.Pwd, node.InitActive, node.MinActive, node.MaxActive}
 			pool, _ := NewConnPool(config)
 			//加锁
-			m.Lock()
+			cluster.m.Lock()
 			clusterPool[node.Url] = pool
 			delete(failNodes, url)
-			m.Unlock()
+			cluster.m.Unlock()
 			log.Printf("节点[%s] 已重连\n", url)
 		}
 	}

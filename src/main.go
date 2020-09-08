@@ -3,23 +3,54 @@ package main
 import (
 	. "client"
 	"fmt"
+	"log"
+	"math/rand"
 	"net"
 	"time"
-	"math/rand"
-	"log"
 )
 
 func main() {
+	testConsistentHash()
 	/*testCluster()
 	time.Sleep(time.Duration(100)*time.Second)*/
-	client:=getClient()
+	/*client:=getClient()
 	multiResult,_:=client.Multi()
 	fmt.Println("开启事务：",multiResult)
-	client.Get("age")
-	client.Get("name")
-	client.Get("age")
+	client.GetShardInfo("age")
+	client.GetShardInfo("name")
+	client.GetShardInfo("age")
 	execResult,_:=client.Discard()
-	fmt.Println("终止事务结果：",execResult)
+	fmt.Println("终止事务结果：",execResult)*/
+}
+
+func testConsistentHash(){
+	cHashRing := NewConsistent()
+	//模拟5台服务器，加入到hash环中
+	for i := 0; i < 5; i++ {
+		si := fmt.Sprintf("%d", i)
+		cHashRing.Add(NewShardInfo(i, "192.168.216.1."+si+":6379", 1))
+	}
+	fmt.Println("-------------", len(cHashRing.Nodes))
+	//输出节点的hash值
+	for k, v := range cHashRing.Nodes {
+		fmt.Println("Hash:", k, " IP:", v.Url)
+	}
+
+	//模拟数据查询
+	ipMap := make(map[string]int, 0)
+	for i := 0; i < 10; i++ {
+		si := fmt.Sprintf("key%d", i)
+		k := cHashRing.GetShardInfo(si)
+		if _, ok := ipMap[k.Url]; ok {
+			ipMap[k.Url] += 1
+		} else {
+			ipMap[k.Url] = 1
+		}
+	}
+
+	for k, v := range ipMap {
+		fmt.Println("Node IP:", k, " count:", v)
+	}
 }
 
 func testCluster() {
