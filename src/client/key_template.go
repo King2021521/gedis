@@ -40,6 +40,10 @@ func (cluster *Cluster) Expire(key string, value int64) (interface{}, error) {
 	return executeExpire(cluster.SelectOne(result.(string)), key, value)
 }
 
+func (sharding *Sharding) Expire(key string, value int64) (interface{}, error) {
+	return executeExpire(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key, value)
+}
+
 func (client *Client) Expire(key string, value int64) (interface{}, error) {
 	return executeExpire(client.getConnectPool(), key, value)
 }
@@ -64,6 +68,10 @@ func (cluster *Cluster) Del(key string) (interface{}, error) {
 	return executeDel(cluster.SelectOne(result.(string)), key)
 }
 
+func (sharding *Sharding) Del(key string) (interface{}, error) {
+	return executeDel(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key)
+}
+
 func (client *Client) Del(key string) (interface{}, error) {
 	return executeDel(client.getConnectPool(), key)
 }
@@ -86,6 +94,10 @@ func (cluster *Cluster) Ttl(key string) (interface{}, error) {
 
 	//重定向到新的节点
 	return executeTtl(cluster.SelectOne(result.(string)), key)
+}
+
+func (sharding *Sharding) Ttl(key string) (interface{}, error) {
+	return executeTtl(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key)
 }
 
 func (client *Client) Ttl(key string) (interface{}, error) {

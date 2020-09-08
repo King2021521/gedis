@@ -1,3 +1,6 @@
+//@author zxm
+//@date 2020-09-08
+//@description 一致性hash的实现算法，参考自https://blog.csdn.net/xcl168/article/details/43898807
 package client
 
 import (

@@ -146,6 +146,46 @@ func (client *Client) Zrevrank(zset string, value string) (interface{}, error) {
 	return executeZrevrank(client.getConnectPool(), zset, value)
 }
 
+func (sharding *Sharding) Zadd(zset string, scoresvalues ...string) (interface{}, error) {
+	return executeZadd(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, scoresvalues)
+}
+
+func (sharding *Sharding) Zscore(zset string, value string) (interface{}, error) {
+	return executeZscore(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, value)
+}
+
+func (sharding *Sharding) Zrange(zset string, start int64, end int64) (interface{}, error) {
+	return executeZrange(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, start, end)
+}
+
+func (sharding *Sharding) ZrangeWithScores(zset string, start int64, end int64) (interface{}, error) {
+	return executeZrangeWithScores(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, start, end)
+}
+
+func (sharding *Sharding) Zrevrange(zset string, start int64, end int64) (interface{}, error) {
+	return executeZrevrange(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, start, end)
+}
+
+func (sharding *Sharding) ZrevrangeWithScores(zset string, start int64, end int64) (interface{}, error) {
+	return executeZrevrangeWithScores(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, start, end)
+}
+
+func (sharding *Sharding) Zcard(zset string) (interface{}, error) {
+	return executeZcard(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset)
+}
+
+func (sharding *Sharding) Zrem(zset string, elements ...string) (interface{}, error) {
+	return executeZrem(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, elements)
+}
+
+func (sharding *Sharding) Zrank(zset string, value string) (interface{}, error) {
+	return executeZrank(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, value)
+}
+
+func (sharding *Sharding) Zrevrank(zset string, value string) (interface{}, error) {
+	return executeZrevrank(sharding.shardingPool[sharding.cHashRing.GetShardInfo(zset).Url], zset, value)
+}
+
 func executeZadd(pool *ConnPool, zset string, scoresvalues []string) (interface{}, error) {
 	conn, err := pool.GetConn()
 	if err != nil {

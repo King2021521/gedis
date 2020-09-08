@@ -16,6 +16,10 @@ func (cluster *Cluster) Hset(hash string, key string, value string) (interface{}
 	return executeHset(cluster.SelectOne(result.(string)), hash, key, value)
 }
 
+func (sharding *Sharding) Hset(hash string, key string, value string) (interface{}, error) {
+	return executeHset(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], hash, key, value)
+}
+
 func (client *Client) Hset(hash string, key string, value string) (interface{}, error) {
 	return executeHset(client.getConnectPool(), hash, key, value)
 }
@@ -38,6 +42,10 @@ func (cluster *Cluster) Hget(hash string, key string) (interface{}, error) {
 
 	//重定向到新的节点
 	return executeHget(cluster.SelectOne(result.(string)), hash, key)
+}
+
+func (sharding *Sharding) Hget(hash string, key string) (interface{}, error) {
+	return executeHget(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], hash, key)
 }
 
 func (client *Client) Hget(hash string, key string) (interface{}, error) {

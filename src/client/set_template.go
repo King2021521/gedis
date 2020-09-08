@@ -124,6 +124,34 @@ func (client *Client) Sdiff(sets ... string) (interface{}, error) {
 	return executeSdiff(client.getConnectPool(), sets)
 }
 
+func (sharding *Sharding) Sadd(set string, elements ...string) (interface{}, error) {
+	return executeSadd(sharding.shardingPool[sharding.cHashRing.GetShardInfo(set).Url], set, elements)
+}
+
+func (sharding *Sharding) Smembers(set string) (interface{}, error) {
+	return executeSmembers(sharding.shardingPool[sharding.cHashRing.GetShardInfo(set).Url], set)
+}
+
+func (sharding *Sharding) Srem(set string, elements ...string) (interface{}, error) {
+	return executeSrem(sharding.shardingPool[sharding.cHashRing.GetShardInfo(set).Url], set, elements)
+}
+
+func (sharding *Sharding) Sismember(set string, value string) (interface{}, error) {
+	return executeSismember(sharding.shardingPool[sharding.cHashRing.GetShardInfo(set).Url], set, value)
+}
+
+func (sharding *Sharding) Scard(set string) (interface{}, error) {
+	return executeScard(sharding.shardingPool[sharding.cHashRing.GetShardInfo(set).Url], set)
+}
+
+func (sharding *Sharding) Srandmembers(set string, count int64) (interface{}, error) {
+	return executeSrandmembers(sharding.shardingPool[sharding.cHashRing.GetShardInfo(set).Url], set, count)
+}
+
+func (sharding *Sharding) Spop(set string) (interface{}, error) {
+	return executeSpop(sharding.shardingPool[sharding.cHashRing.GetShardInfo(set).Url], set)
+}
+
 func executeSadd(pool *ConnPool, set string, elements []string) (interface{}, error) {
 	conn, err := pool.GetConn()
 	if err != nil {

@@ -183,6 +183,61 @@ func (client *Client) LinsertAfter(list string, target string, value string) (in
 	return executeLinsertAfter(client.getConnectPool(), list, target, value)
 }
 
+func (sharding *Sharding) Lpush(list string, elements ...string) (interface{}, error) {
+	return executeLpush(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list, elements)
+}
+
+func (sharding *Sharding) Rpush(list string, elements ...string) (interface{}, error) {
+	return executeRpush(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list, elements)
+}
+
+func (sharding *Sharding) Lrange(list string, start int64, end int64) (interface{}, error) {
+	return executeLrange(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list, start, end)
+}
+
+func (sharding *Sharding) Lpop(list string) (interface{}, error) {
+	return executeLpop(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list)
+}
+
+func (sharding *Sharding) Rpop(list string) (interface{}, error) {
+	return executeRpop(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list)
+}
+
+func (sharding *Sharding) Llen(list string) (interface{}, error) {
+	return executeLlen(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list)
+}
+
+/**
+ *  count > 0 : 从表头开始向表尾搜索，移除与 VALUE 相等的元素，数量为 COUNT 。
+ *  count < 0 : 从表尾开始向表头搜索，移除与 VALUE 相等的元素，数量为 COUNT 的绝对值。
+ *  count = 0 : 移除表中所有与 VALUE 相等的值。
+ */
+func (sharding *Sharding) Lrem(list string, count int64, value string) (interface{}, error) {
+	return executeLrem(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list, count, value)
+}
+
+func (sharding *Sharding) Lindex(list string, pos int64) (interface{}, error) {
+	return executeLindex(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list, pos)
+}
+
+func (sharding *Sharding) Lset(list string, pos int64, value string) (interface{}, error) {
+	return executeLset(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list, pos, value)
+}
+
+/**
+ * target 目标元素
+ */
+func (sharding *Sharding) LinsertBefore(list string, target string, value string) (interface{}, error) {
+	return executeLinsertBefore(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list, target, value)
+}
+
+/**
+ * target 目标元素
+ */
+func (sharding *Sharding) LinsertAfter(list string, target string, value string) (interface{}, error) {
+	return executeLinsertAfter(sharding.shardingPool[sharding.cHashRing.GetShardInfo(list).Url], list, target, value)
+}
+
 func executeLpush(pool *ConnPool, list string, elements []string) (interface{}, error) {
 	conn, err := pool.GetConn()
 	if err != nil {

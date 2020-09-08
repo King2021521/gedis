@@ -16,6 +16,11 @@ func (cluster *Cluster) Auth(pwd string) (interface{}, error) {
 	return executeAuth(cluster.SelectOne(result.(string)), pwd)
 }
 
+func (sharding *Sharding) Auth(pwd string) (interface{}, error){
+	shard := sharding.cHashRing.GetShardInfo(pwd)
+	return executeAuth(sharding.shardingPool[shard.Url], pwd)
+}
+
 /**
  * 认证权限
  */
@@ -43,6 +48,10 @@ func (cluster *Cluster) Set(key string, value string) (interface{}, error) {
 	return executeSet(cluster.SelectOne(result.(string)), key, value)
 }
 
+func (sharding *Sharding) Set(key string, value string) (interface{}, error) {
+	return executeSet(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key, value)
+}
+
 func (client *Client) Set(key string, value string) (interface{}, error) {
 	return executeSet(client.getConnectPool(), key, value)
 }
@@ -65,6 +74,10 @@ func (cluster *Cluster) Get(key string) (interface{}, error) {
 
 	//重定向到新的节点
 	return executeGet(cluster.SelectOne(value.(string)), key)
+}
+
+func (sharding *Sharding) Get(key string) (interface{}, error) {
+	return executeGet(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key)
 }
 
 func (client *Client) Get(key string) (interface{}, error) {
@@ -142,6 +155,10 @@ func (cluster *Cluster) Setnx(key string, value string) (interface{}, error) {
 	return executeSetnx(cluster.SelectOne(result.(string)), key, value)
 }
 
+func (sharding *Sharding) Setnx(key string, value string) (interface{}, error) {
+	return executeSetnx(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key, value)
+}
+
 func (client *Client) Setnx(key string, value string) (interface{}, error) {
 	return executeSetnx(client.getConnectPool(), key, value)
 }
@@ -154,6 +171,10 @@ func executeSetnx(pool *ConnPool, key string, value string) (interface{}, error)
 	defer pool.PutConn(conn)
 	result := SendCommand(conn, protocol.SETNX, protocol.SafeEncode(key), protocol.SafeEncode(value))
 	return handler.HandleReply(result)
+}
+
+func (sharding *Sharding) Incr(key string) (interface{}, error) {
+	return executeIncr(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key)
 }
 
 func (client *Client) Incr(key string) (interface{}, error) {
@@ -190,6 +211,10 @@ func (cluster *Cluster) Decr(key string) (interface{}, error) {
 	return executeDecr(cluster.SelectOne(result.(string)), key)
 }
 
+func (sharding *Sharding) Decr(key string) (interface{}, error) {
+	return executeDecr(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key)
+}
+
 func (client *Client) Decr(key string) (interface{}, error) {
 	return executeDecr(client.getConnectPool(), key)
 }
@@ -212,6 +237,10 @@ func (cluster *Cluster) Setex(key string, time int64, value string) (interface{}
 
 	//重定向到新的节点
 	return executeSetex(cluster.SelectOne(result.(string)), key, time, value)
+}
+
+func (sharding *Sharding) Setex(key string, time int64, value string) (interface{}, error) {
+	return executeSetex(sharding.shardingPool[sharding.cHashRing.GetShardInfo(key).Url], key, time, value)
 }
 
 func (client *Client) Setex(key string, time int64, value string) (interface{}, error) {

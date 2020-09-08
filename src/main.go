@@ -10,7 +10,8 @@ import (
 )
 
 func main() {
-	testConsistentHash()
+	testSharding()
+	//testConsistentHash()
 	/*testCluster()
 	time.Sleep(time.Duration(100)*time.Second)*/
 	/*client:=getClient()
@@ -51,6 +52,26 @@ func testConsistentHash(){
 	for k, v := range ipMap {
 		fmt.Println("Node IP:", k, " count:", v)
 	}
+}
+
+func testSharding(){
+	var s1 = Shard{"192.168.96.232:6379", "vs959yUyx3", 50,5,200}
+	var s2 = Shard{"192.168.96.4:6379", "K5re9U#mX@", 50,5,200}
+	shards := []*Shard{&s1, &s2}
+	var shardConfig = ShardConfig{shards, 10}
+	sharding := NewSharding(shardConfig)
+	rand.Seed(time.Now().UnixNano())
+	for i:=0;i<20;i++{
+		go func() {
+			for {
+				value, err := sharding.Get("teams")
+				log.Printf("请求结果：%s, err: %s",value, err)
+				fmt.Println("查询结果",value)
+				time.Sleep(time.Duration(rand.Intn(3))*time.Second)
+			}
+		}()
+	}
+	time.Sleep(1000*10)
 }
 
 func testCluster() {

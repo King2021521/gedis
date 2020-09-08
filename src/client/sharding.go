@@ -1,3 +1,6 @@
+//@author zxm
+//基于客户端分片形式的集群
+//采用一致性哈希
 package client
 
 import (
@@ -114,7 +117,7 @@ func (sharding *Sharding) heartBeat() {
 			}
 		}
 		//恢复检测
-		_recover(failNodes, shardingPool)
+		sharding.recover(failNodes, shardingPool)
 
 		time.Sleep(time.Duration(interval) * time.Second)
 	}
@@ -135,7 +138,7 @@ func _ping(node *Shard) (interface{}, error) {
 /**
  * 检测fail节点是否已恢复正常
  */
-func _recover(failNodes map[string]*Shard, shardingPool map[string]*ConnPool) {
+func (sharding *Sharding) recover(failNodes map[string]*Shard, shardingPool map[string]*ConnPool) {
 	for url, node := range failNodes {
 		conn := Connect(url)
 		if conn != nil {
@@ -143,10 +146,10 @@ func _recover(failNodes map[string]*Shard, shardingPool map[string]*ConnPool) {
 			var config = ConnConfig{url, node.Pwd, node.InitActive, node.MinActive, node.MaxActive}
 			pool, _ := NewConnPool(config)
 			//加锁
-			m.Lock()
+			sharding.m.Lock()
 			shardingPool[node.Url] = pool
 			delete(failNodes, url)
-			m.Unlock()
+			sharding.m.Unlock()
 			log.Printf("节点[%s] 已重连\n", url)
 		}
 	}
