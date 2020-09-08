@@ -36,7 +36,29 @@ func getConn() *net.TCPConn {
 	pool := NewSingleConnPool(1, config)
 	conn, _ := GetConn(pool)
 	return conn
+}  
+
+//基于客户端分片集群
+func testSharding(){
+	var s1 = Shard{"192.168.96.232:6379", "vs959yUyx3", 50,5,200}
+	var s2 = Shard{"192.168.96.4:6379", "K5re9U#mX@", 50,5,200}
+	shards := []*Shard{&s1, &s2}
+	var shardConfig = ShardConfig{shards, 10}
+	sharding := NewSharding(shardConfig)
+	rand.Seed(time.Now().UnixNano())
+	for i:=0;i<20;i++{
+		go func() {
+			for {
+				value, err := sharding.Get("teams")
+				log.Printf("请求结果：%s, err: %s",value, err)
+				fmt.Println("查询结果",value)
+				time.Sleep(time.Duration(rand.Intn(3))*time.Second)
+			}
+		}()
+	}
+	time.Sleep(1000*10)
 }
+
 //单机版
 func getClient() *Client {
 	var config = ConnConfig{"127.0.0.1:7002", "123456"}
@@ -56,7 +78,10 @@ cluster支持
 loadbalance支持  
 heartBeat支持  
 连接池的监控及动态扩容  
-更多内容持续更新中  
+3.0 特性  
+支持客户端分片集群方式  
+一致性哈希  
+（不支持多key操作）
 
 author: tony  
 博客地址：https://blog.csdn.net/u012737673  
