@@ -68,6 +68,11 @@ func NewSharding(shardConfig ShardConfig) *Sharding {
 	sharding.config = &shardConfig
 	sharding.shardingPool = shardingPool
 
+	//初始化节点健康检测线程
+	defer func() {
+		go sharding.heartBeat()
+	}()
+
 	if sharding.m == nil {
 		sharding.m = new(sync.RWMutex)
 	}
