@@ -2,11 +2,11 @@ package client
 
 import (
 	"errors"
+	"gedis/src/protocol"
+	"log"
 	"net"
 	"sync"
-	"protocol"
 	"time"
-	"log"
 )
 
 const defaultMaxActive = 100

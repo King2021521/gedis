@@ -1,14 +1,14 @@
 package client
 
 import (
-	"protocol"
-	"client/handler"
 	"fmt"
+	"gedis/src/client/handler"
+	"gedis/src/protocol"
 )
 
 func (cluster *Cluster) Sadd(set string, elements ...string) (interface{}, error) {
 	result, err := executeSadd(cluster.RandomSelect(), set, elements)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -18,7 +18,7 @@ func (cluster *Cluster) Sadd(set string, elements ...string) (interface{}, error
 
 func (cluster *Cluster) Smembers(set string) (interface{}, error) {
 	result, err := executeSmembers(cluster.RandomSelect(), set)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -28,7 +28,7 @@ func (cluster *Cluster) Smembers(set string) (interface{}, error) {
 
 func (cluster *Cluster) Srem(set string, elements ...string) (interface{}, error) {
 	result, err := executeSrem(cluster.RandomSelect(), set, elements)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -38,7 +38,7 @@ func (cluster *Cluster) Srem(set string, elements ...string) (interface{}, error
 
 func (cluster *Cluster) Sismember(set string, value string) (interface{}, error) {
 	result, err := executeSismember(cluster.RandomSelect(), set, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -48,7 +48,7 @@ func (cluster *Cluster) Sismember(set string, value string) (interface{}, error)
 
 func (cluster *Cluster) Scard(set string) (interface{}, error) {
 	result, err := executeScard(cluster.RandomSelect(), set)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -58,7 +58,7 @@ func (cluster *Cluster) Scard(set string) (interface{}, error) {
 
 func (cluster *Cluster) Srandmembers(set string, count int64) (interface{}, error) {
 	result, err := executeSrandmembers(cluster.RandomSelect(), set, count)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -68,7 +68,7 @@ func (cluster *Cluster) Srandmembers(set string, count int64) (interface{}, erro
 
 func (cluster *Cluster) Spop(set string) (interface{}, error) {
 	result, err := executeSpop(cluster.RandomSelect(), set)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -79,9 +79,9 @@ func (cluster *Cluster) Spop(set string) (interface{}, error) {
 /**
  * 返回给定所有集合的差集
  */
-func (cluster *Cluster) Sdiff(sets ... string) (interface{}, error) {
+func (cluster *Cluster) Sdiff(sets ...string) (interface{}, error) {
 	result, err := executeSdiff(cluster.RandomSelect(), sets)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -120,7 +120,7 @@ func (client *Client) Spop(set string) (interface{}, error) {
 /**
  * 返回给定所有集合的差集
  */
-func (client *Client) Sdiff(sets ... string) (interface{}, error) {
+func (client *Client) Sdiff(sets ...string) (interface{}, error) {
 	return executeSdiff(client.getConnectPool(), sets)
 }
 

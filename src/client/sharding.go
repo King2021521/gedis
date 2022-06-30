@@ -4,9 +4,9 @@
 package client
 
 import (
-	"client/handler"
+	"gedis/src/client/handler"
+	"gedis/src/protocol"
 	"log"
-	"protocol"
 	"sync"
 	"time"
 )
@@ -25,9 +25,10 @@ type Shard struct {
 	MinActive  int
 	MaxActive  int
 }
+
 //分片配置
 type ShardConfig struct {
-	Shards             []*Shard
+	Shards            []*Shard
 	HeartBeatInterval int
 }
 
@@ -37,10 +38,10 @@ type ShardConfig struct {
  * shardingPool key：连接串 value:连接池
  */
 type Sharding struct {
-	cHashRing   *Consistent
-	config      *ShardConfig
+	cHashRing    *Consistent
+	config       *ShardConfig
 	shardingPool map[string]*ConnPool
-	m *sync.RWMutex
+	m            *sync.RWMutex
 }
 
 //初始化日志

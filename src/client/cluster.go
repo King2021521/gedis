@@ -1,12 +1,12 @@
 package client
 
 import (
-	"time"
-	"sync"
-	"log"
 	"fmt"
-	"protocol"
-	"client/handler"
+	"gedis/src/client/handler"
+	"gedis/src/protocol"
+	"log"
+	"sync"
+	"time"
 )
 
 //默认心跳检测轮询时间间隔，单位s
@@ -38,7 +38,7 @@ type ClusterConfig struct {
 type Cluster struct {
 	config      *ClusterConfig
 	clusterPool map[string]*ConnPool
-	m *sync.RWMutex
+	m           *sync.RWMutex
 }
 
 func init() {

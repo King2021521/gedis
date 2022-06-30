@@ -1,8 +1,8 @@
 package main
 
 import (
-	. "client"
 	"fmt"
+	"gedis/src/client"
 	"log"
 	"math/rand"
 	"net"
@@ -24,12 +24,12 @@ func main() {
 	fmt.Println("终止事务结果：",execResult)*/
 }
 
-func testConsistentHash(){
-	cHashRing := NewConsistent()
+func testConsistentHash() {
+	cHashRing := client.NewConsistent()
 	//模拟5台服务器，加入到hash环中
 	for i := 0; i < 5; i++ {
 		si := fmt.Sprintf("%d", i)
-		cHashRing.Add(NewShardInfo(i, "192.168.216.1."+si+":6379", 1))
+		cHashRing.Add(client.NewShardInfo(i, "192.168.216.1."+si+":6379", 1))
 	}
 	fmt.Println("-------------", len(cHashRing.Nodes))
 	//输出节点的hash值
@@ -54,59 +54,59 @@ func testConsistentHash(){
 	}
 }
 
-func testSharding(){
-	var s1 = Shard{"192.168.96.232:6379", "vs959yUyx3", 50,5,200}
-	var s2 = Shard{"192.168.96.4:6379", "K5re9U#mX@", 50,5,200}
-	shards := []*Shard{&s1, &s2}
-	var shardConfig = ShardConfig{shards, 10}
-	sharding := NewSharding(shardConfig)
+func testSharding() {
+	var s1 = client.Shard{"192.168.96.232:6379", "vs959yUyx3", 50, 5, 200}
+	var s2 = client.Shard{"192.168.96.4:6379", "K5re9U#mX@", 50, 5, 200}
+	shards := []*client.Shard{&s1, &s2}
+	var shardConfig = client.ShardConfig{shards, 10}
+	sharding := client.NewSharding(shardConfig)
 	rand.Seed(time.Now().UnixNano())
-	for i:=0;i<20;i++{
+	for i := 0; i < 20; i++ {
 		go func() {
 			for {
 				value, err := sharding.Get("teams")
-				log.Printf("请求结果：%s, err: %s",value, err)
-				fmt.Println("查询结果",value)
-				time.Sleep(time.Duration(rand.Intn(3))*time.Second)
+				log.Printf("请求结果：%s, err: %s", value, err)
+				fmt.Println("查询结果", value)
+				time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
 			}
 		}()
 	}
-	time.Sleep(1000*10)
+	time.Sleep(1000 * 10)
 }
 
 func testCluster() {
-	var node7000 = Node{"127.0.0.1:7000", "123456", 50,5,200}
-	var node7001 = Node{"127.0.0.1:7001", "123456", 50,5,200}
-	var node7002 = Node{"127.0.0.1:7002", "123456", 50,5,200}
-	var node7003 = Node{"127.0.0.1:7003", "123456", 50,5,200}
-	var node7004 = Node{"127.0.0.1:7004", "123456", 50,5,200}
-	var node7005 = Node{"127.0.0.1:7005", "123456", 50,5,200}
+	var node7000 = client.Node{"127.0.0.1:7000", "123456", 50, 5, 200}
+	var node7001 = client.Node{"127.0.0.1:7001", "123456", 50, 5, 200}
+	var node7002 = client.Node{"127.0.0.1:7002", "123456", 50, 5, 200}
+	var node7003 = client.Node{"127.0.0.1:7003", "123456", 50, 5, 200}
+	var node7004 = client.Node{"127.0.0.1:7004", "123456", 50, 5, 200}
+	var node7005 = client.Node{"127.0.0.1:7005", "123456", 50, 5, 200}
 
-	nodes := []*Node{&node7000, &node7001, &node7002, &node7003, &node7004, &node7005}
-	var clusterConfig = ClusterConfig{nodes, 10}
-	cluster := NewCluster(clusterConfig)
+	nodes := []*client.Node{&node7000, &node7001, &node7002, &node7003, &node7004, &node7005}
+	var clusterConfig = client.ClusterConfig{nodes, 10}
+	cluster := client.NewCluster(clusterConfig)
 	rand.Seed(time.Now().UnixNano())
-	for i:=0;i<20;i++{
+	for i := 0; i < 20; i++ {
 		go func() {
 			for {
 				value, err := cluster.Get("name")
-				log.Printf("请求结果：%s, err: %s",value, err)
-				time.Sleep(time.Duration(rand.Intn(3))*time.Second)
+				log.Printf("请求结果：%s, err: %s", value, err)
+				time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
 			}
 		}()
 	}
 }
 
 func getConn() *net.TCPConn {
-	var config = ConnConfig{"127.0.0.1:6379", "root",1,1,1}
-	pool := NewSingleConnPool(config)
+	var config = client.ConnConfig{"127.0.0.1:6379", "root", 1, 1, 1}
+	pool := client.NewSingleConnPool(config)
 	conn, _ := pool.GetConn()
 	return conn
 }
 
-func getClient() *Client {
-	var config = ConnConfig{"127.0.0.1:6379", "",1,1,1}
-	pool := NewSingleConnPool(config)
+func getClient() *client.Client {
+	var config = client.ConnConfig{"127.0.0.1:6379", "", 1, 1, 1}
+	pool := client.NewSingleConnPool(config)
 
-	return BuildClient(pool)
+	return client.BuildClient(pool)
 }

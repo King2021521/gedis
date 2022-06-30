@@ -2,12 +2,13 @@
 package client
 
 import (
-	"net"
 	"bytes"
-	"protocol"
-	"strconv"
 	"fmt"
+	"gedis/src/protocol"
+	"net"
+	"strconv"
 )
+
 /**
  * 通信协议处理：如redis操作：set key value，解析成redis理解的格式后就是：
  * *3\r\n$3\r\nset\r\n$3\r\nkey\r\n$5\r\nvalue\r\n

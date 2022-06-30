@@ -1,14 +1,14 @@
 package client
 
 import (
-	"protocol"
-	"client/handler"
 	"fmt"
+	"gedis/src/client/handler"
+	"gedis/src/protocol"
 )
 
 func (cluster *Cluster) Hset(hash string, key string, value string) (interface{}, error) {
 	result, err := executeHset(cluster.RandomSelect(), hash, key, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -36,7 +36,7 @@ func executeHset(pool *ConnPool, hash string, key string, value string) (interfa
 
 func (cluster *Cluster) Hget(hash string, key string) (interface{}, error) {
 	result, err := executeHget(cluster.RandomSelect(), hash, key)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -64,7 +64,7 @@ func executeHget(pool *ConnPool, hash string, key string) (interface{}, error) {
 
 func (cluster *Cluster) Hmset(hash string, keyvalues ...string) (interface{}, error) {
 	result, err := executeHmset(cluster.RandomSelect(), hash, keyvalues)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -89,7 +89,7 @@ func executeHmset(pool *ConnPool, hash string, keyvalues []string) (interface{},
 
 func (cluster *Cluster) Hmget(hash string, keys ...string) (interface{}, error) {
 	result, err := executeHmget(cluster.RandomSelect(), hash, keys)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -114,7 +114,7 @@ func executeHmget(pool *ConnPool, hash string, keys []string) (interface{}, erro
 
 func (cluster *Cluster) Hgetall(hash string) (interface{}, error) {
 	result, err := executeHgetall(cluster.RandomSelect(), hash)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -138,7 +138,7 @@ func executeHgetall(pool *ConnPool, hash string) (interface{}, error) {
 
 func (cluster *Cluster) Hexists(hash string, key string) (interface{}, error) {
 	result, err := executeHexists(cluster.RandomSelect(), hash, key)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -162,7 +162,7 @@ func executeHexists(pool *ConnPool, hash string, key string) (interface{}, error
 
 func (cluster *Cluster) Hdel(hash string, key string) (interface{}, error) {
 	result, err := executeHdel(cluster.RandomSelect(), hash, key)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -186,7 +186,7 @@ func executeHdel(pool *ConnPool, hash string, key string) (interface{}, error) {
 
 func (cluster *Cluster) Hkeys(hash string) (interface{}, error) {
 	result, err := executeHkeys(cluster.RandomSelect(), hash)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -210,7 +210,7 @@ func executeHkeys(pool *ConnPool, hash string) (interface{}, error) {
 
 func (cluster *Cluster) Hvalues(hash string) (interface{}, error) {
 	result, err := executeHvalues(cluster.RandomSelect(), hash)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 

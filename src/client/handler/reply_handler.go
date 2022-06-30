@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"strings"
-	"protocol"
 	"fmt"
+	"gedis/src/protocol"
 	"github.com/emirpasic/gods/lists/arraylist"
+	"strings"
 )
 
 /**
@@ -95,7 +95,7 @@ func handleMovedReply(result string) (interface{}, error) {
 }
 
 //处理事务执行结果
-func HandleTransactionReply(result string)(interface{}, error){
+func HandleTransactionReply(result string) (interface{}, error) {
 	elements := strings.Split(result, protocol.CRLF)
 	var values []string
 	//解析事务批量执行的返回结果

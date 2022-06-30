@@ -1,15 +1,15 @@
 package client
 
 import (
-	"net"
-	"protocol"
-	"client/handler"
 	"fmt"
+	"gedis/src/client/handler"
+	"gedis/src/protocol"
+	"net"
 )
 
 func (cluster *Cluster) Lpush(list string, elements ...string) (interface{}, error) {
 	result, err := executeLpush(cluster.RandomSelect(), list, elements)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -19,7 +19,7 @@ func (cluster *Cluster) Lpush(list string, elements ...string) (interface{}, err
 
 func (cluster *Cluster) Rpush(list string, elements ...string) (interface{}, error) {
 	result, err := executeRpush(cluster.RandomSelect(), list, elements)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -29,7 +29,7 @@ func (cluster *Cluster) Rpush(list string, elements ...string) (interface{}, err
 
 func (cluster *Cluster) Lrange(list string, start int64, end int64) (interface{}, error) {
 	result, err := executeLrange(cluster.RandomSelect(), list, start, end)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -39,7 +39,7 @@ func (cluster *Cluster) Lrange(list string, start int64, end int64) (interface{}
 
 func (cluster *Cluster) Lpop(list string) (interface{}, error) {
 	result, err := executeLpop(cluster.RandomSelect(), list)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -49,7 +49,7 @@ func (cluster *Cluster) Lpop(list string) (interface{}, error) {
 
 func (cluster *Cluster) Rpop(list string) (interface{}, error) {
 	result, err := executeRpop(cluster.RandomSelect(), list)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -59,7 +59,7 @@ func (cluster *Cluster) Rpop(list string) (interface{}, error) {
 
 func (cluster *Cluster) Llen(list string) (interface{}, error) {
 	result, err := executeLlen(cluster.RandomSelect(), list)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -74,7 +74,7 @@ func (cluster *Cluster) Llen(list string) (interface{}, error) {
  */
 func (cluster *Cluster) Lrem(list string, count int64, value string) (interface{}, error) {
 	result, err := executeLrem(cluster.RandomSelect(), list, count, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -84,7 +84,7 @@ func (cluster *Cluster) Lrem(list string, count int64, value string) (interface{
 
 func (cluster *Cluster) Lindex(list string, pos int64) (interface{}, error) {
 	result, err := executeLindex(cluster.RandomSelect(), list, pos)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -94,7 +94,7 @@ func (cluster *Cluster) Lindex(list string, pos int64) (interface{}, error) {
 
 func (cluster *Cluster) Lset(list string, pos int64, value string) (interface{}, error) {
 	result, err := executeLset(cluster.RandomSelect(), list, pos, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -107,7 +107,7 @@ func (cluster *Cluster) Lset(list string, pos int64, value string) (interface{},
  */
 func (cluster *Cluster) LinsertBefore(list string, target string, value string) (interface{}, error) {
 	result, err := executeLinsertBefore(cluster.RandomSelect(), list, target, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -120,7 +120,7 @@ func (cluster *Cluster) LinsertBefore(list string, target string, value string) 
  */
 func (cluster *Cluster) LinsertAfter(list string, target string, value string) (interface{}, error) {
 	result, err := executeLinsertAfter(cluster.RandomSelect(), list, target, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 

@@ -1,14 +1,14 @@
 package client
 
 import (
-	"protocol"
-	"client/handler"
 	"fmt"
+	"gedis/src/client/handler"
+	"gedis/src/protocol"
 )
 
 func (cluster *Cluster) Keys(regex string) (interface{}, error) {
 	result, err := executeKeys(cluster.RandomSelect(), regex)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -32,7 +32,7 @@ func executeKeys(pool *ConnPool, regex string) (interface{}, error) {
 
 func (cluster *Cluster) Expire(key string, value int64) (interface{}, error) {
 	result, err := executeExpire(cluster.RandomSelect(), key, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -60,7 +60,7 @@ func executeExpire(pool *ConnPool, key string, value int64) (interface{}, error)
 
 func (cluster *Cluster) Del(key string) (interface{}, error) {
 	result, err := executeDel(cluster.RandomSelect(), key)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -88,7 +88,7 @@ func executeDel(pool *ConnPool, key string) (interface{}, error) {
 
 func (cluster *Cluster) Ttl(key string) (interface{}, error) {
 	result, err := executeTtl(cluster.RandomSelect(), key)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -118,7 +118,7 @@ func (client *Client) Ping() (interface{}, error) {
 	return executePing(client.getConnectPool())
 }
 
-func executePing(pool *ConnPool)(interface{}, error){
+func executePing(pool *ConnPool) (interface{}, error) {
 	conn, err := pool.GetConn()
 	if err != nil {
 		return nil, fmt.Errorf("get conn fail")

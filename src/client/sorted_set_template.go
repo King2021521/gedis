@@ -1,14 +1,14 @@
 package client
 
 import (
-	"protocol"
-	"client/handler"
 	"fmt"
+	"gedis/src/client/handler"
+	"gedis/src/protocol"
 )
 
 func (cluster *Cluster) Zadd(zset string, scoresvalues ...string) (interface{}, error) {
 	result, err := executeZadd(cluster.RandomSelect(), zset, scoresvalues)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -18,7 +18,7 @@ func (cluster *Cluster) Zadd(zset string, scoresvalues ...string) (interface{}, 
 
 func (cluster *Cluster) Zscore(zset string, value string) (interface{}, error) {
 	result, err := executeZscore(cluster.RandomSelect(), zset, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -28,7 +28,7 @@ func (cluster *Cluster) Zscore(zset string, value string) (interface{}, error) {
 
 func (cluster *Cluster) Zrange(zset string, start int64, end int64) (interface{}, error) {
 	result, err := executeZrange(cluster.RandomSelect(), zset, start, end)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -38,7 +38,7 @@ func (cluster *Cluster) Zrange(zset string, start int64, end int64) (interface{}
 
 func (cluster *Cluster) ZrangeWithScores(zset string, start int64, end int64) (interface{}, error) {
 	result, err := executeZrangeWithScores(cluster.RandomSelect(), zset, start, end)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -48,7 +48,7 @@ func (cluster *Cluster) ZrangeWithScores(zset string, start int64, end int64) (i
 
 func (cluster *Cluster) Zrevrange(zset string, start int64, end int64) (interface{}, error) {
 	result, err := executeZrevrange(cluster.RandomSelect(), zset, start, end)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -58,7 +58,7 @@ func (cluster *Cluster) Zrevrange(zset string, start int64, end int64) (interfac
 
 func (cluster *Cluster) ZrevrangeWithScores(zset string, start int64, end int64) (interface{}, error) {
 	result, err := executeZrevrangeWithScores(cluster.RandomSelect(), zset, start, end)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -68,7 +68,7 @@ func (cluster *Cluster) ZrevrangeWithScores(zset string, start int64, end int64)
 
 func (cluster *Cluster) Zcard(zset string) (interface{}, error) {
 	result, err := executeZcard(cluster.RandomSelect(), zset)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -78,7 +78,7 @@ func (cluster *Cluster) Zcard(zset string) (interface{}, error) {
 
 func (cluster *Cluster) Zrem(zset string, elements ...string) (interface{}, error) {
 	result, err := executeZrem(cluster.RandomSelect(), zset, elements)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -88,7 +88,7 @@ func (cluster *Cluster) Zrem(zset string, elements ...string) (interface{}, erro
 
 func (cluster *Cluster) Zrank(zset string, value string) (interface{}, error) {
 	result, err := executeZrank(cluster.RandomSelect(), zset, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -98,7 +98,7 @@ func (cluster *Cluster) Zrank(zset string, value string) (interface{}, error) {
 
 func (cluster *Cluster) Zrevrank(zset string, value string) (interface{}, error) {
 	result, err := executeZrevrank(cluster.RandomSelect(), zset, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 

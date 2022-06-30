@@ -1,8 +1,8 @@
 package handler
 
-import "protocol"
+import "gedis/src/protocol"
 
-func HandleMultiBulkRequest(key string, elements []string) [][]byte{
+func HandleMultiBulkRequest(key string, elements []string) [][]byte {
 	bytes := make([][]byte, len(elements)+1)
 	bytes[0] = protocol.SafeEncode(key)
 	for i := 0; i < len(elements); i++ {
@@ -11,7 +11,7 @@ func HandleMultiBulkRequest(key string, elements []string) [][]byte{
 	return bytes
 }
 
-func HandleBulkRequest(elements []string) [][]byte{
+func HandleBulkRequest(elements []string) [][]byte {
 	bytes := make([][]byte, len(elements))
 	for i := 0; i < len(elements); i++ {
 		bytes[i] = protocol.SafeEncode(elements[i])

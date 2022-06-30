@@ -1,14 +1,14 @@
 package client
 
 import (
-	"protocol"
-	"client/handler"
 	"fmt"
+	"gedis/src/client/handler"
+	"gedis/src/protocol"
 )
 
 func (cluster *Cluster) Auth(pwd string) (interface{}, error) {
 	result, err := executeAuth(cluster.RandomSelect(), pwd)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -16,7 +16,7 @@ func (cluster *Cluster) Auth(pwd string) (interface{}, error) {
 	return executeAuth(cluster.SelectOne(result.(string)), pwd)
 }
 
-func (sharding *Sharding) Auth(pwd string) (interface{}, error){
+func (sharding *Sharding) Auth(pwd string) (interface{}, error) {
 	shard := sharding.cHashRing.GetShardInfo(pwd)
 	return executeAuth(sharding.shardingPool[shard.Url], pwd)
 }
@@ -40,7 +40,7 @@ func executeAuth(pool *ConnPool, pwd string) (interface{}, error) {
 
 func (cluster *Cluster) Set(key string, value string) (interface{}, error) {
 	result, err := executeSet(cluster.RandomSelect(), key, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -68,7 +68,7 @@ func executeSet(pool *ConnPool, key string, value string) (interface{}, error) {
 
 func (cluster *Cluster) Get(key string) (interface{}, error) {
 	value, err := executeGet(cluster.RandomSelect(), key)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return value, err
 	}
 
@@ -97,7 +97,7 @@ func executeGet(pool *ConnPool, key string) (interface{}, error) {
 
 func (cluster *Cluster) Mset(keyvalues ...string) (interface{}, error) {
 	value, err := executeMset(cluster.RandomSelect(), keyvalues)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return value, err
 	}
 
@@ -122,7 +122,7 @@ func executeMset(pool *ConnPool, keyvalues []string) (interface{}, error) {
 
 func (cluster *Cluster) Mget(keys ...string) (interface{}, error) {
 	value, err := executeMget(cluster.RandomSelect(), keys)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return value, err
 	}
 
@@ -147,7 +147,7 @@ func executeMget(pool *ConnPool, keys []string) (interface{}, error) {
 
 func (cluster *Cluster) Setnx(key string, value string) (interface{}, error) {
 	result, err := executeSetnx(cluster.RandomSelect(), key, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -183,7 +183,7 @@ func (client *Client) Incr(key string) (interface{}, error) {
 
 func (cluster *Cluster) Incr(key string) (interface{}, error) {
 	result, err := executeIncr(cluster.RandomSelect(), key)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -203,7 +203,7 @@ func executeIncr(pool *ConnPool, key string) (interface{}, error) {
 
 func (cluster *Cluster) Decr(key string) (interface{}, error) {
 	result, err := executeDecr(cluster.RandomSelect(), key)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
@@ -231,7 +231,7 @@ func executeDecr(pool *ConnPool, key string) (interface{}, error) {
 
 func (cluster *Cluster) Setex(key string, time int64, value string) (interface{}, error) {
 	result, err := executeSetex(cluster.RandomSelect(), key, time, value)
-	if err==nil || err.Error() != protocol.MOVED {
+	if err == nil || err.Error() != protocol.MOVED {
 		return result, err
 	}
 
